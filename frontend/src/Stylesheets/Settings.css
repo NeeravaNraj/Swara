@@ -1,0 +1,89 @@
+.settings-window-container {
+  width: 700px;
+  height: 60vh;
+  display: grid;
+  grid-template-areas: "sideleft content";
+  grid-template-columns: 240px auto;
+  background-color: rgb(65, 65, 65);
+  border-radius: 10px;
+}
+
+.settings-sidebar {
+  grid-area: sideleft;
+  background-color: rgb(41, 41, 41);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.settings-main {
+  grid-area: content;
+}
+
+.settings-title {
+  color: white;
+  font-size: 2rem;
+  padding-left: 1.2em;
+}
+
+.settings-options-container {
+  display: flex;
+  flex-direction: column;
+  padding: 2em 1em;
+  align-items: flex-start;
+  gap: 1em;
+  width: 100%;
+}
+
+.sidebar-option {
+  background: transparent;
+  border: none;
+  color: rgb(194, 194, 194);
+  font-size: 1.2em;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  transition: 0.5s;
+  text-align: start;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.sidebar-option:hover {
+  background-color: rgba(113, 112, 112, 0.5);
+  border-radius: 5px;
+  color: white;
+}
+
+.select-form-container {
+  width: 90%;
+  padding: 0 2em;
+}
+
+.settings-descriptor {
+  color: white;
+  margin: 0;
+  margin-bottom: 0.7em;
+  margin-left: 0.2em;
+}
+
+.editor {
+  padding-top: 3em;
+}
+
+.settings-btns-container {
+  display: flex;
+  margin-top: 1em;
+  gap: 1em;
+}
+
+
+@media screen and (max-width: 750px) {
+  .settings-window-container {
+  width: 500px;
+  height: 60vh;
+  display: grid;
+  grid-template-areas: "sideleft content";
+  grid-template-columns: 170px auto;
+  background-color: rgb(65, 65, 65);
+  border-radius: 10px;
+}
+}

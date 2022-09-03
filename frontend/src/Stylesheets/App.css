@@ -1,0 +1,14 @@
+.grid-container {
+  display: grid;
+  grid-template-areas: "sideleft content";
+  grid-template-columns: 250px auto;
+  grid-auto-rows: 90vh;
+}
+
+.sidebar-left {
+  grid-area: sideleft;
+}
+
+.mainview {
+  grid-area: content;
+}

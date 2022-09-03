@@ -1,0 +1,447 @@
+.bottombar {
+  background-color: #3e3939;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 5.8em;
+  z-index: 1000;
+}
+
+.container {
+  margin: 1em 2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.volume-slider {
+  display: flex;
+  align-items: center;
+}
+
+.progress-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  float: center;
+}
+
+.song-info {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  width: 9%;
+  position: relative;
+}
+
+.song-img {
+  background-color: #ff7517;
+  height: 60px;
+  width: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.song-meta {
+  width: 150%;
+  position: absolute;
+  margin-left: 4.5rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.songname {
+  font-size: 16px;
+  margin: 0;
+  color: white;
+  font-weight: 400;
+  z-index: 3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.songtype {
+  margin: 0;
+  font-size: 14px;
+  z-index: 3;
+  cursor: pointer;
+  color: rgb(170, 169, 169);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.music-icon {
+  font-size: 1.3rem;
+}
+
+.buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+}
+
+.play-pause {
+  background: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.play {
+  position: relative;
+  left: 1px;
+  /* bottom: 0px; */
+}
+
+.play-pause:hover {
+  color: rgb(69, 68, 68);
+}
+
+.forward-backward {
+  background: none;
+  /* border-radius: 50%; */
+  height: 25px;
+  width: 25px;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  transition: 0.2s;
+  color: rgb(244, 244, 244);
+}
+
+.forward-backward:hover {
+  color: rgb(233, 233, 233);
+}
+
+.current-time,
+.duration {
+  font-family: "Poppins", sans-serif;
+  color: white;
+  font-size: 14px;
+  font-weight: 300;
+  position: relative;
+  top: 4px;
+  width: 1.8em;
+}
+
+.mute-btn {
+  border: none;
+  background: none;
+  background: transparent;
+  font-size: 1rem;
+}
+
+.vol-speaker {
+  color: white;
+  position: relative;
+  top: 2px;
+  cursor: pointer;
+}
+
+.vol-speaker:active {
+  color: #bfbfbf;
+}
+
+.progress-bar {
+  --bar-bg: gray;
+  --seek-before-width: 0;
+  --seek-before-color: white;
+  --knob: white;
+  --selected-knob: white;
+
+  appearance: none;
+  background: var(--bar-bg);
+  position: relative;
+  width: 500px;
+  height: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* progress bar - safari */
+.progress-bar::-webkit-slider-runnable-track {
+  background: var(--bar-bg);
+  position: relative;
+  width: 100%;
+  height: 4px;
+  border-radius: 5px;
+  outline: none;
+}
+
+/* progress bar - firefox */
+
+.progress-bar::-moz-range-track {
+  background: var(--bar-bg);
+  position: relative;
+  width: 100%;
+  height: 4px;
+  border-radius: 5px;
+  outline: none;
+}
+
+.progress-bar::-moz-focus-outer {
+  border: 0;
+}
+
+/* progress bar before play head styles - chrome and safari*/
+.progress-bar::before {
+  content: "";
+  height: 5px;
+  width: var(--seek-before-width);
+  background-color: var(--seek-before-color);
+  position: absolute;
+  border-radius: 5px;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+/* progress bar before play head styles - firefox*/
+.progress-bar::-moz-range-progress {
+  background-color: var(--seek-before-color);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  height: 5px;
+}
+
+.progress-bar:hover {
+  --seek-before-color: #ff7517;
+}
+
+/* knob - chrome safari */
+.progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 0px;
+  width: 0px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--knob);
+  cursor: pointer;
+  position: relative;
+  margin: -4px 0 0 0;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+.progress-bar:hover::-webkit-slider-thumb {
+  height: 12px;
+  width: 12px;
+}
+
+/* knob - firefox */
+.progress-bar::-moz-range-thumb {
+  height: 0px;
+  width: 0px;
+  border-radius: 50%;
+  border: transparent;
+  background-color: var(--knob);
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+.progress-bar:hover::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+}
+
+/* Stlying volume bar - google apple */
+.volume-bar {
+  --bar-bg: gray;
+  --volume-before-width: 100%;
+  --volume-before-color: white;
+  --knob: white;
+  --selected-knob: white;
+
+  appearance: none;
+  background: var(--bar-bg);
+  position: relative;
+  width: 150px;
+  border-radius: 5px;
+  height: 5px;
+  outline: none;
+}
+
+.volume-bar:hover {
+  --volume-before-color: #ff7517;
+  cursor: pointer;
+}
+
+.volume-bar::-webkit-slider-runnable-track {
+  background: var(--bar-bg);
+  position: relative;
+  width: 100%;
+  height: 4px;
+  border-radius: 5px;
+  outline: none;
+}
+
+/* volume bar before play head styles - chrome and safari*/
+.volume-bar::before {
+  content: "";
+  height: 5px;
+  width: var(--volume-before-width);
+  background-color: var(--volume-before-color);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  position: absolute;
+  border-radius: 5px;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+/* volume knob - chrome safari */
+.volume-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 0px;
+  width: 0px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--knob);
+  cursor: pointer;
+  position: relative;
+  margin: -4px 0 0 0;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+.volume-bar:hover::-webkit-slider-thumb {
+  height: 12px;
+  width: 12px;
+}
+
+/* Volume bar - firefox */
+
+.volume-bar::-moz-range-track {
+  background: var(--bar-bg);
+  position: relative;
+  width: 100%;
+  border-radius: 5px;
+  height: 4px;
+  outline: none;
+}
+
+.volume-bar::-moz-focus-outer {
+  border: 0;
+}
+
+/* progress bar before play head styles - firefox*/
+.volume-bar::-moz-range-progress {
+  background-color: var(--volume-before-color);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  height: 5px;
+}
+
+/* knob - firefox */
+.volume-bar::-moz-range-thumb {
+  height: 0px;
+  width: 0px;
+  border-radius: 50%;
+  border: transparent;
+  background-color: var(--knob);
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+.volume-bar:hover::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+}
+
+@media screen and (max-width: 900px) {
+  .volume-bar {
+    --bar-bg: gray;
+    --volume-before-width: 100%;
+    --volume-before-color: white;
+    --knob: white;
+    --selected-knob: white;
+
+    appearance: none;
+    background: var(--bar-bg);
+    position: relative;
+    width: 100px;
+    border-radius: 5px;
+    height: 5px;
+    outline: none;
+  }
+  .song-info {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    width: 20%;
+    position: relative;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .volume-bar {
+    --bar-bg: gray;
+    --volume-before-width: 100%;
+    --volume-before-color: white;
+    --knob: white;
+    --selected-knob: white;
+
+    appearance: none;
+    background: var(--bar-bg);
+    position: relative;
+    width: 100px;
+    border-radius: 5px;
+    height: 5px;
+    outline: none;
+  }
+  .song-info {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    width: 18%;
+    position: relative;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .volume-bar {
+    --bar-bg: gray;
+    --volume-before-width: 100%;
+    --volume-before-color: white;
+    --knob: white;
+    --selected-knob: white;
+
+    appearance: none;
+    background: var(--bar-bg);
+    position: relative;
+    width: 100px;
+    border-radius: 5px;
+    height: 5px;
+    outline: none;
+  }
+  .song-info {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    width: 23%;
+    position: relative;
+  }
+}

@@ -1,0 +1,46 @@
+.details-box {
+  background-color: rgb(57, 57, 57);
+  padding: 1.5em 1em 1em 2.5em;
+  width: 350px;
+  border-radius: 15px;
+  overflow: auto;
+}
+
+.content {
+  color: white;
+}
+
+.name {
+  font-size: 1.8em;
+  margin-top: 0.5em;
+  color: #ff8e43;
+}
+
+.raga-details {
+  margin-top: 0;
+  font-weight: 500;
+  font-size: 1.1em;
+}
+
+.type-text {
+  font-weight: 500;
+  margin-top: 0;
+  font-size: 1em;
+}
+
+.complyrtun {
+  font-weight: 400;
+  margin-top: 0;
+}
+
+.lyrics {
+  font-size: 1.2em;
+  font-weight: 400;
+  margin-top: 0;
+}
+
+.descriptor {
+  margin: 0;
+  padding: 0;
+  color: gray;
+}

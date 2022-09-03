@@ -1,0 +1,79 @@
+.searchbar-container {
+  width: 100%;
+  height: 20vh;
+  /* position: fixed; */
+}
+
+.searchbar {
+  flex-shrink: 0;
+  background-color: rgb(53, 53, 53);
+  padding: 0.5em 1em;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin: 2em 1em 0;
+  border-radius: 10px;
+  transition: 0.5s;
+  z-index: 10;
+  position: relative;
+  /* position: fixed; */
+}
+
+.search-icon {
+  font-size: 1.5em;
+  color: white;
+}
+
+.search-input {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  color: white;
+  outline: none;
+  width: 100%;
+  height: 50px;
+}
+
+.suggestions-container {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em 0em 1em;
+  margin: 0 1.5em 0;
+  position: absolute;
+  border-radius: 0 0 10px 10px;
+  /* height: 30%; */
+  overflow: auto;
+  width: 15%;
+  left: 81%;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255, 255, 255);
+  scrollbar-base-color: #3e3939;
+  scroll-behavior: smooth;
+  z-index: 50;
+}
+
+.suggestions {
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 1em 0;
+  }
+  
+  
+.spinner-container {
+  display: flex;
+  /* position: absolute; */
+  align-items: center;
+  justify-content: center;
+  padding-top: 1em;
+}
+.search-results-title {
+  color: white;
+  font-size: 2rem;
+  margin-left: 0.3em;
+}
+
+.active {
+  background-color: rgb(213, 213, 213);
+}

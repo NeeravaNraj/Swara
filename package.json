@@ -1,0 +1,78 @@
+{
+  "name": "swara",
+  "version": "1.0.0",
+  "description": "Swara",
+  "author": "Neerava <neerava.nraj@gmail.com>",
+  "homepage": "./",
+  "email": "neerava.nraj@gmail.com",
+  "license": "ISC",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "electron:serve": "concurrently -k \"cd frontend && cross-env BROWSER=none npm start \" \"npm run electron:start\"",
+    "electron:build": "cd frontend && npm run build && cd .. && electron-builder -c.extraMetadata.main=main.js",
+    "build": "electron-builder -c.extraMetadata.main=main.js",
+    "electron:start": "wait-on tcp:3000 && electron --trace-warnings .",
+    "electron:build:linux": "cd frontend && npm run build && cd .. && electron-builder --linux"
+  },
+  "build": {
+    "extends": null,
+    "appId": "Swara",
+    "asar": false,
+    "files": [
+      "dist/**/*",
+      "frontend/build/**/*",
+      "backend/build/**/*",
+      "node_modules/**/*",
+      "frontend/package.json",
+      "backend/package.json",
+      "main.js",
+      "package.json",
+      "preStartConfigurator.js",
+      "Swara-dark.png",
+      "Swara-light-png"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "Swara-transparent.png"
+    },
+    "nsis": {
+      "allowElevation": true,
+      "installerIcon": "",
+      "uninstallerIcon": "",
+      "uninstallDisplayName": "Swara",
+      "license": "license.txt",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "icon": "Swara-transparent.png"
+    }
+  },
+  "dependencies": {
+    "@electron/remote": "^2.0.8",
+    "concurrently": "^7.3.0",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "electron-is-dev": "^2.0.0",
+    "express": "^4.18.1",
+    "get-audio-duration": "^3.1.0",
+    "hazardous": "^0.3.0",
+    "knex": "^2.2.0",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.0.11",
+    "wait-on": "^6.0.1"
+  },
+  "devDependencies": {
+    "electron-builder": "^23.3.3",
+    "electron": "^20.0.3"
+  }
+}
