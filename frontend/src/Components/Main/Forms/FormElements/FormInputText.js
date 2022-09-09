@@ -17,7 +17,7 @@ const theme = createTheme({
   },
 });
 
-function FormInputText({ name, label, control, multiline, rows, required }) {
+function FormInputText({ name, label, control, multiline, rows, required, focused, maxRows }) {
   return (
     <Controller
       name={name}
@@ -38,6 +38,8 @@ function FormInputText({ name, label, control, multiline, rows, required }) {
               minRows={rows}
               sx={{ mb: 2 }}
               required={required}
+              autoFocus={focused}
+              maxRows={maxRows}
             />
           </ThemeProvider>
         );

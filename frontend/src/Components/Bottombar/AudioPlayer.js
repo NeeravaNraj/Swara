@@ -59,7 +59,18 @@ function AudioPlayer() {
   useEffect(() => {
     if (typeof window !== undefined) {
       const prevId = localStorage.getItem("urlId");
-      updateCurrSong(prevId);
+      (async () => {
+        if (prevId) {
+          await axios
+            .get(`${URL}/api/stream/${prevId}`, {
+              headers: {
+                Range: "bytes=0-1000",
+              },
+            })
+            .then(() => updateCurrSong(prevId))
+            .catch(() => updateCurrSong(""));
+        }
+      })();
       volumeBar.current.value = localStorage.getItem("volume") * 100;
       audioPlayer.current.volume = localStorage.getItem("volume");
       progressBar.current.value = localStorage.getItem("prevTime");
@@ -231,6 +242,15 @@ function AudioPlayer() {
   }, [data, index]);
 
   useEffect(() => {
+    if (urlId === "") {
+      setSongname({ name: "", type: "" });
+      setCurrentTime(0);
+      setPlaying(false);
+      setDuration(0);
+      if (typeof window !== undefined) {
+        localStorage.setItem("urlId", "");
+      }
+    }
     if (currIsPlaying === false && isPlaying === true) {
       audioPlayer?.current?.pause();
       cancelAnimationFrame(animationRef.current);
@@ -246,9 +266,9 @@ function AudioPlayer() {
       if (currIsPlaying) {
         songList[index] &&
           setDuration(Math.floor(Math.floor(songList[index].song_duration)));
-        audioPlayer.current.play();
-        animationRef.current = requestAnimationFrame(whilePlaying);
-        setPlaying(true);
+          audioPlayer.current.play();
+          animationRef.current = requestAnimationFrame(whilePlaying);
+          setPlaying(true);
       } else {
         audioPlayer.current.pause();
         cancelAnimationFrame(animationRef.current);
@@ -260,6 +280,14 @@ function AudioPlayer() {
   }, [currIsPlaying]);
 
   useEffect(() => {
+    if (urlId !== "") {
+      if (songList && songList.length === 1) {
+        if (Number(currentTime) === duration) {
+          setCurrentTime(0);
+          audioPlayer.current.currentTime = 0;
+        }
+      }
+    }
     if (isPlaying && currIsPlaying === true) {
       if (Number(currentTime) === duration) {
         updateIsPlaying(false);
@@ -336,16 +364,15 @@ function AudioPlayer() {
             updateCurrSong(element.song_id);
             setDuration(Math.floor(element.song_duration));
             cancelAnimationFrame(animationRef.current);
-            if (audioPlayer?.current?.readyState === 4) {
-              progressBar.current.value = 0;
-              setSongname({
-                name: element.song_name,
-                type: element.song_type,
-              });
-              setPlaying(true);
-              updateIsPlaying(true);
-              setEnded(false);
-            }
+
+            progressBar.current.value = 0;
+            setSongname({
+              name: element.song_name,
+              type: element.song_type,
+            });
+            setPlaying(true);
+            updateIsPlaying(true);
+            setEnded(false);
           } else {
             setEnded(false);
           }
@@ -373,16 +400,15 @@ function AudioPlayer() {
             updateCurrSong(element.song_id);
             setDuration(Math.floor(element.song_duration));
             cancelAnimationFrame(animationRef.current);
-            if (audioPlayer?.current?.readyState === 4) {
-              progressBar.current.value = 0;
-              setSongname({
-                name: element.song_name,
-                type: element.song_type,
-              });
-              setPlaying(true);
-              updateIsPlaying(true);
-              setPrevEnded(false);
-            }
+
+            progressBar.current.value = 0;
+            setSongname({
+              name: element.song_name,
+              type: element.song_type,
+            });
+            setPlaying(true);
+            updateIsPlaying(true);
+            setPrevEnded(false);
           } else {
             setPrevEnded(false);
           }
@@ -392,6 +418,7 @@ function AudioPlayer() {
       return;
     }
   }, [prevEnded]);
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -426,22 +453,12 @@ function AudioPlayer() {
 
   const handlePlay = () => {
     const prevVal = isPlaying;
-    updateIsPlaying(!currIsPlaying);
-    setPlaying(!prevVal);
-    try {
-      songList[index] && setDuration(Math.floor(songList[index].song_duration));
-    } catch (err) {
+    if (urlId === "") {
       updateIsPlaying(false);
-      setPlaying(!false);
-      return;
-    }
-    if (urlId !== "" || undefined) {
-      if (data.length === 1) {
-        if (Number(currentTime) === duration) {
-          setCurrentTime(0);
-          audioPlayer.current.currentTime = 0;
-        }
-      }
+      setPlaying(false);
+    } else {
+      updateIsPlaying(!currIsPlaying);
+      setPlaying(!prevVal);
     }
     if (!prevVal) {
       if (audioPlayer?.current?.readyState === 4) {
@@ -552,13 +569,16 @@ function AudioPlayer() {
     <>
       <audio
         ref={audioPlayer}
-        src={`${URL}/api/stream/` + String(urlId)}
+        src={`${URL}/api/stream/${urlId}`}
         type="audio/mp3"
         preload="metadata"
         onLoadedData={handleSongChange}
       ></audio>
       <div className="container">
-        <div className="song-info">
+        <div
+          className="song-info"
+          style={{ visibility: urlId === "" ? "hidden" : "visible" }}
+        >
           <div className="song-img">
             <FaMusic className="music-icon" />
           </div>

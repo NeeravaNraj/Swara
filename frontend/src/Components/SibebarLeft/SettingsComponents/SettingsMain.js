@@ -29,6 +29,7 @@ function SettingsMain({ view, handleError }) {
   const [selectedId, setSelectedId] = useState(null);
   const [areYouSureContent, setAreYouSure] = useState({});
   const [options, setOptions] = useState(null);
+
   const URL = useUrl();
 
   useEffect(() => {

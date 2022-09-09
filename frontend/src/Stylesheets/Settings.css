@@ -75,6 +75,10 @@
   gap: 1em;
 }
 
+.error-container{
+  align-self: flex-start;
+}
+
 
 @media screen and (max-width: 750px) {
   .settings-window-container {

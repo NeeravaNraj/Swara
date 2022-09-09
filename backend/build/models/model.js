@@ -46,8 +46,12 @@ const db = knex(config);
   }
 })();
 
-const seed = () => {
-  db.seed.run();
+const seed = async () => {
+  try{
+    await db.seed.run();
+  }catch(err){
+    return
+  }
 };
 
 const getDuration = async (route) => {

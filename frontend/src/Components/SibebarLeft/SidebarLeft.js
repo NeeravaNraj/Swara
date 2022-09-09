@@ -21,7 +21,7 @@ import axios from "axios";
 import EditPlaylist from "./EditPlaylist";
 import SettingsWindow from "./SettingsComponents/SettingsWindow";
 
-function SidbarLeft(props) {
+function SidbarLeft() {
   const { setShow } = useFormShowContext();
   const { setShowPlaylist } = useShowPlaylistForm();
   const { allPlaylists, setAllPlaylists } = useAllPlaylists();
@@ -35,7 +35,6 @@ function SidbarLeft(props) {
   const [showSettings, setShowSettings] = useState(false);
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState("");
-
   useEffect(() => {
     playlists();
   }, [allPlaylists]);
@@ -102,17 +101,7 @@ function SidbarLeft(props) {
   return (
     <>
       <div className="sidebar-left">
-        <Box className="error-container">
-          <Slide direction="down" in={checked} mountOnEnter unmountOnExit>
-            <Box
-              color={"error"}
-              sx={{ color: "black", backgroundColor: "white" }}
-              className="error-box"
-            >
-              {error}
-            </Box>
-          </Slide>
-        </Box>
+        
         {showEditPlaylist && (
           <EditPlaylist
             open={showEditPlaylist}
@@ -126,6 +115,8 @@ function SidbarLeft(props) {
             open={showSettings}
             close={(v) => setShowSettings(v)}
             handleError={(v) => handleError(v)}
+            checked={checked}
+            error={error}
           />
         )}
         <div className="sidebar-container">

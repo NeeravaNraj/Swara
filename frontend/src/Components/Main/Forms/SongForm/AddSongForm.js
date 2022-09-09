@@ -3,6 +3,7 @@ import { useState } from "react";
 import "../../../../Stylesheets/./Form.css";
 import { Button, Stack, Box, Slide, CircularProgress } from "@mui/material";
 import { TiTick } from "react-icons/ti";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import axios from "axios";
 import {
   useSongContext,
@@ -36,6 +37,7 @@ const AddSongForm = () => {
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const [file, setFile] = useState(null);
   const [isUploaded, setUploaded] = useState(false);
@@ -61,15 +63,24 @@ const AddSongForm = () => {
   };
 
   const onSubmit = async (fdata) => {
-    setIsLoading(true)
+    setIsLoading(true);
     const formData = new FormData();
     formData.append("id", fdata.id);
     formData.append("song_name", fdata.song_name);
     formData.append("raga", fdata.raga);
     formData.append("song_type", fdata.song_type);
-    formData.append("tuned_by", fdata.tuned_by);
-    formData.append("composer", fdata.composer);
-    formData.append("lyricist", fdata.lyricist);
+    formData.append(
+      "tuned_by",
+      fdata.tuned_by === "" ? "unknown" : fdata.tuned_by
+    );
+    formData.append(
+      "composer",
+      fdata.composer === "" ? "unknown" : fdata.composer
+    );
+    formData.append(
+      "lyricist",
+      fdata.lyricist === "" ? "unknown" : fdata.lyricist
+    );
     formData.append("lyrics", fdata.lyrics);
     formData.append("song_path", file);
 
@@ -91,6 +102,12 @@ const AddSongForm = () => {
         updateNumOfSongs((prev) => prev + 1);
       })
       .catch((err) => {
+        setTimeout(() => {
+          setIsError(false);
+          setIsLoading(false);
+          setShow(false);
+        }, 1000);
+        setIsError(true);
         console.log(err);
       });
   };
@@ -115,32 +132,42 @@ const AddSongForm = () => {
 
   return (
     <>
-      <div className="background" onClick={onClickHandleFormClose}>
-        <div className="form-error-box">
-          <Box className="error-container-form">
-            <Slide direction="down" in={checked} mountOnEnter unmountOnExit>
-              <Box
-                color={"error"}
-                sx={{ color: "black", backgroundColor: "white" }}
-                className="error-box"
-              >
-                {error}
-              </Box>
-            </Slide>
-          </Box>
-        </div>
+      <div className="form-error-box">
+        <Box className="error-container-form">
+          <Slide direction="down" in={checked} mountOnEnter unmountOnExit>
+            <Box
+              color={"error"}
+              sx={{ color: "black", backgroundColor: "white" }}
+              className="error-box"
+            >
+              {error}
+            </Box>
+          </Slide>
+        </Box>
       </div>
+      <div className="background" onClick={onClickHandleFormClose}></div>
       <div className="form-container">
         <div className="flex-reset">
           {isLoading ? (
-            <div className="upload-success" onClick={onClickHandleFormClose}>
-              {isUploaded ? (
-                <>
-                  <TiTick className="tick" />
-                  <h2 className="success-text">Upload Success</h2>
-                </>
+            <div
+              className={isError ? "upload-error" : "upload-success"}
+              onClick={onClickHandleFormClose}
+            >
+              {!isError ? (
+                isUploaded && (
+                  <>
+                    <TiTick className="tick" />
+                    <h2 className="success-text">Upload Success</h2>
+                  </>
+                )
               ) : (
-                <CircularProgress className="form-loading"/>
+                <>
+                  <IoIosCloseCircleOutline className="cross" />
+                  <h2 className="success-text">Something went wrong</h2>
+                </>
+              )}
+              {!isError && !isUploaded && (
+                <CircularProgress className="form-loading" />
               )}
             </div>
           ) : (
@@ -162,6 +189,8 @@ const AddSongForm = () => {
                   label="Song name"
                   multiline={false}
                   required={true}
+                  focused={true}
+                  maxRows={1}
                 />
 
                 <FormInputAutoComplete
@@ -212,27 +241,38 @@ const AddSongForm = () => {
                   rows={3}
                   control={control}
                   required={false}
+                  focused={false}
+                  maxRows={6}
                 />
+                <div className="audio-file-related">
+                  <Button
+                    className="audio-file"
+                    component="label"
+                    variant="contained"
+                    color="warning"
+                    sx={{ mb: 1, mt: 1 }}
+                    size="small"
+                    required={true}
+                  >
+                    {file !== null ? (
+                      <TiTick className="tick smalltick" />
+                    ) : (
+                      "Upload audio file"
+                    )}
+                    <input
+                      type="file"
+                      onChange={fileChangeHandle}
+                      name="song_path"
+                      hidden
+                      required
+                      accept=".mp3, .ogg, .wav, .m4a"
+                    ></input>
+                  </Button>
+                  {file !== null && (
+                    <p className="file-selected">{file?.name}</p>
+                  )}
+                </div>
 
-                <Button
-                  className="audio-file"
-                  component="label"
-                  variant="contained"
-                  color="warning"
-                  sx={{ mb: 1, mt: 1 }}
-                  size="large"
-                  required={true}
-                >
-                  Audio file
-                  <input
-                    type="file"
-                    onChange={fileChangeHandle}
-                    name="song_path"
-                    hidden
-                    required
-                    accept=".mp3, .ogg, .wav"
-                  ></input>
-                </Button>
                 <div className="sub-close">
                   <Button
                     onClick={onClickHandleFormClose}

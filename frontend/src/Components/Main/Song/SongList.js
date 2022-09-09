@@ -12,7 +12,7 @@ import {
   useViews,
   useNumberOfSongs,
   useAllPlaylists,
-  useUrl
+  useUrl,
 } from "../../../Hooks/SongProvider";
 import axios from "axios";
 import { Menu, MenuItem, createTheme, ThemeProvider } from "@mui/material";
@@ -39,7 +39,7 @@ function SongList(props) {
   const { currentView } = useViews();
   const { updateNumOfSongs } = useNumberOfSongs();
   const { allPlaylists } = useAllPlaylists();
-  const URL = useUrl()
+  const URL = useUrl();
 
   useEffect(() => {
     if (currentSong !== props.id) {
@@ -62,7 +62,7 @@ function SongList(props) {
     }
   }, [currIsPlaying]);
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     updateSong(props.id);
     setProvIndex(props.index);
     updateIsPlaying(!currIsPlaying);
@@ -78,7 +78,12 @@ function SongList(props) {
       }
     });
     updateData(filteredData);
-    await axios.delete(`${URL}/api/songs/` + props.id);
+    await axios.delete(`${URL}/api/songs/` + props.id).then(() => {
+      if (props.id === currentSong) {
+        updateSong("");
+        updateIsPlaying(false);
+      }
+    });
     updateNumOfSongs((prev) => prev - 1);
   };
 
@@ -105,9 +110,7 @@ function SongList(props) {
       }
     });
     updateData(filterData);
-    await axios.delete(
-      `${URL}/api/song-playlist/song/` + props.id
-    );
+    await axios.delete(`${URL}/api/song-playlist/song/` + props.id);
     updateNumOfSongs((prev) => prev - 1);
   };
 
@@ -208,9 +211,9 @@ function SongList(props) {
           <h2
             className="song-name"
             style={
-               props.id === currentSong
-                  ? { color: "#FF7517" }
-                  : { color: "white" }
+              props.id === currentSong
+                ? { color: "#FF7517" }
+                : { color: "white" }
             }
           >
             {props.song_name}

@@ -48,7 +48,7 @@
     storage: fileStorageEngine,
     fileFilter: (req, file, callback) => {
       let ext = path.extname(file.originalname);
-      if (ext !== ".mp3" && ext !== ".wav" && ext !== ".ogg") {
+      if (ext !== ".mp3" && ext !== ".wav" && ext !== ".ogg" && ext !== ".m4a") {
         return callback(new Error("Only audio files allowed."));
       }
       callback(null, true);
@@ -112,7 +112,7 @@
       }
     };
 
-    const getSize = async () => {
+    const stream = async () => {
       const file = await getPath();
       try {
         const audioSize = fs.statSync(String(file)).size;
@@ -133,10 +133,12 @@
 
         audioStream.pipe(res);
       } catch (err) {
-        console.log(err);
+        return;
       }
     };
-    getSize();
+    if (id !== "") {
+      stream();
+    }
   });
 
   //get by id
