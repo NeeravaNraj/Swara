@@ -9,12 +9,11 @@
 }
 
 .mainview::-webkit-scrollbar{
-  width: 0.9vw;
+  width: 1.1em;
 }
 
 .mainview::-webkit-scrollbar-thumb{
   background-color: #8d8d8d;
-  /* opacity: 0.5; */
   border-radius: 0px;
 }
 
@@ -63,7 +62,7 @@
 }
 
 .footing {
-  height: 10%;
+  height: 30px;
 }
 
 .top-content-container {

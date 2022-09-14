@@ -12,9 +12,10 @@ import {
   useViews,
   useSongContext,
   useNumberOfSongs,
-  useUrl
+  useUrl,
+  useIsPlayingContext,
 } from "../../Hooks/SongProvider";
-import {Box, Slide} from '@mui/material'
+import { Box, Slide } from "@mui/material";
 import { nanoid } from "nanoid";
 import Playlists from "./Playlists";
 import axios from "axios";
@@ -26,9 +27,9 @@ function SidbarLeft() {
   const { setShowPlaylist } = useShowPlaylistForm();
   const { allPlaylists, setAllPlaylists } = useAllPlaylists();
   const { setCurrView } = useViews();
-  const { updateData } = useSongContext();
+  const { updateData, setSearchFocused } = useSongContext();
   const { updateNumOfSongs } = useNumberOfSongs();
-  const URL = useUrl()
+  const URL = useUrl();
 
   const [showEditPlaylist, setShowEditPlaylist] = useState(false);
   const [editPlaylistId, setEditPlaylistId] = useState(null);
@@ -40,12 +41,10 @@ function SidbarLeft() {
   }, [allPlaylists]);
 
   const handleSelect = (playlistId) => {
-    axios
-      .get(`${URL}/api/playlist/` + String(playlistId))
-      .then((resp) => {
-        updateData(resp.data.content.songs);
-        updateNumOfSongs(resp.data.content.numOfSongs);
-      });
+    axios.get(`${URL}/api/playlist/${playlistId}`).then((resp) => {
+      updateData(resp.data.content.songs);
+      updateNumOfSongs(resp.data.content.numOfSongs);
+    });
   };
 
   const playlists = () => {
@@ -65,10 +64,12 @@ function SidbarLeft() {
 
   const handleFormOpen = () => {
     setShow(true);
+    setSearchFocused(true);
   };
 
   const handlePlaylistFormOpen = () => {
     setShowPlaylist(true);
+    setSearchFocused(true);
   };
 
   const handleSelectAll = (type) => {
@@ -87,10 +88,12 @@ function SidbarLeft() {
   const handleEdit = (v) => {
     setEditPlaylistId(v);
     setShowEditPlaylist(true);
+    setSearchFocused(true);
   };
 
   const handleShowSettings = () => {
     setShowSettings(true);
+    setSearchFocused(true);
   };
   const handleError = (error) => {
     setTimeout(() => setChecked(false), 1900);
@@ -101,7 +104,6 @@ function SidbarLeft() {
   return (
     <>
       <div className="sidebar-left">
-        
         {showEditPlaylist && (
           <EditPlaylist
             open={showEditPlaylist}

@@ -6,7 +6,7 @@ const { spawn } = require("child_process");
 
 require("@electron/remote/main").initialize();
 
-const configurator = path.join(__dirname, "preStartConfigurator.js")
+let configurator = path.resolve(__dirname, "preStartConfigurator.js");
 
 const prep = spawn("node", [configurator]);
 
@@ -24,20 +24,41 @@ prep.on("exit", (code) => {
 });
 
 const createWindow = () => {
-  const win = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 1600,
     height: 900,
+    autoHideMenuBar: true,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
     },
   });
 
+  const splash = new BrowserWindow({
+    width: 750,
+    height: 900,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+  });
+
+  splash.loadFile(path.join(__dirname, "splashscreen", "build", "index.html"));
   if (!isDev) {
-    win.loadFile(path.join(__dirname, "frontend", "build", "index.html"));
+    mainWindow.loadFile(
+      path.join(__dirname, "frontend", "build", "index.html")
+    );
   } else {
-    win.loadURL("http://localhost:3000");
+    mainWindow.loadURL("http://localhost:3000");
   }
+
+  mainWindow.once("ready-to-show", () => {
+    setTimeout(() => {
+      splash.close();
+      mainWindow.center();
+      mainWindow.show();
+    }, 2000);
+  });
 };
 
 app.whenReady().then(() => {

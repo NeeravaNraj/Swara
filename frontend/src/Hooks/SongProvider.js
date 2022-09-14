@@ -72,6 +72,7 @@ export function SongContextProvider({ children }) {
   const [isRunning, setRunning] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [searchData, setSearchData] = useState({});
+  const [currentPlayingPlaylist, setCurrentPlaylingPlaylist] = useState(0);
   const [currentView, setCurrentView] = useState({
     name: "Home",
     playlist_id: null,
@@ -80,9 +81,12 @@ export function SongContextProvider({ children }) {
   const [showPlaylistForm, setShowPlaylistForm] = useState(false);
   const [allPlaylists, setAllPlaylists] = useState([]);
   const [maxPages, setMaxPages] = useState(1);
+  const [page, setPage] = useState(1);
+  const [maxReached, setMaxReached] = useState(false);
   const [numOfSongs, setNumOfSongs] = useState(0);
   const [songName, setSongName] = useState({});
   const [providerIndex, setProviderIndex] = useState(undefined);
+  const [searchFocused, setSearchFocused] = useState(false);
 
   function setCurrSong(id) {
     setCurrentSong(id);
@@ -97,11 +101,19 @@ export function SongContextProvider({ children }) {
     setSongname: (v) => setSongName(v),
     providerIndex: providerIndex,
     setProvIndex: (v) => setProviderIndex(v),
+    page: page,
+    setPage: (v) => setPage(v),
+    maxReached: maxReached,
+    setMaxReached: (v) => setMaxReached(v),
+    currentPlayingPlaylist: currentPlayingPlaylist,
+    setCurrentPlaylingPlaylist: (v) => setCurrentPlaylingPlaylist(v),
   };
 
   const dataControls = {
     data: data,
     updateData: (input) => setData(input),
+    searchFocused: searchFocused,
+    setSearchFocused: (v) => setSearchFocused(v),
   };
 
   const showFormControls = {
@@ -150,9 +162,7 @@ export function SongContextProvider({ children }) {
       .catch((err) => {
         console.log(err);
       });
-    axios
-      .get(`${URL}/api/playlist`)
-      .then((resp) => setAllPlaylists(resp.data));
+    axios.get(`${URL}/api/playlist`).then((resp) => setAllPlaylists(resp.data));
   }, []);
 
   useEffect(() => {

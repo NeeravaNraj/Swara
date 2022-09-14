@@ -11,6 +11,7 @@ import {
   useMaxPages,
   useNumberOfSongs,
   useUrl,
+  useIsPlayingContext,
 } from "../../Hooks/SongProvider";
 import AddPlaylistForm from "./Forms/PlaylistForm/AddPlaylistForm";
 import NoSongs from "./SearchView/PlaylistSearch/NoSongs";
@@ -25,24 +26,21 @@ import Lyrics from "./LyricsViews/Lyrics";
 import LyricsFullScreen from "./LyricsViews/LyricsFullScreen";
 
 function Mainview() {
-  const { data, updateData } = useSongContext();
+  const { data, updateData, searchFocused } = useSongContext();
   const { showForm } = useFormShowContext();
   const { showPlaylistForm } = useShowPlaylistForm();
   const { currentView, setCurrView } = useViews();
-  const { maxPages, updateMaxPages } = useMaxPages();
+  const { maxPages } = useMaxPages();
   const { numOfSongs } = useNumberOfSongs();
+  const { page, setPage, maxReached, setMaxReached, currentPlayingPlaylist } =
+    useIsPlayingContext();
   const URL = useUrl();
-  
+
   const [songsList, setSongsList] = useState([]);
   const [selecting, setSelecting] = useState(false);
   const [prevView, setPrevView] = useState("");
-  const [page, setPage] = useState(1);
-  const [maxReached, setMaxReached] = useState(false);
-  const [field, setField] = useState("");
-  const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showEditSong, setEditSong] = useState(false);
   const [editItems, setEditItems] = useState(null);
@@ -75,7 +73,10 @@ function Mainview() {
   };
 
   useEffect(() => {
-    if (currentView.playlist_id !== null) {
+    if (
+      currentView.playlist_id !== null ||
+      currentView.view_name === "search"
+    ) {
       listedSongs();
     }
   }, [data]);
@@ -96,27 +97,15 @@ function Mainview() {
   }, [currentView, numOfSongs]);
 
   useEffect(() => {
-    if (page === maxPages) {
+    if (page === maxPages || data.length === numOfSongs) {
       setMaxReached(true);
+    } else {
+      setMaxReached(false);
     }
-  }, [page]);
+  }, [page, data]);
 
   useEffect(() => {
-    if (scrollPercentage >= 70 && scrollPercentage < 80) {
-      if (currentView.view_name === "search") {
-        if (!maxReached) {
-          setPage((prev) => prev + 1);
-          axios
-            .get(
-              `${URL}/api/search?query=${searchQuery}&field=${field}&page=${
-                page + 1
-              }`
-            )
-            .then((resp) =>
-              updateData((prev) => prev.concat(resp.data.content.results))
-            );
-        }
-      }
+    if (scrollPercentage >= 70 && scrollPercentage < 100) {
       if (data.length < numOfSongs) {
         if (
           currentView.view_name === "playlist" &&
@@ -130,7 +119,8 @@ function Mainview() {
                   page + 1
                 }`
               )
-              .then((resp) =>
+              .then((resp) => {
+                updateData((prev) => prev.concat(resp.data.content.songs));
                 setSongsList((prev) =>
                   prev.concat(
                     resp.data.content.songs.map((song, idx) => {
@@ -156,8 +146,8 @@ function Mainview() {
                       );
                     })
                   )
-                )
-              );
+                );
+              });
           }
         }
       }
@@ -165,9 +155,10 @@ function Mainview() {
   }, [scrollPercentage, currentView]);
 
   useEffect(() => {
-    setPage(1);
-    setMaxReached(false);
-    setLoading(false);
+    if (currentView.playlist_id !== currentPlayingPlaylist) {
+      setPage(1);
+      setMaxReached(false);
+    }
     setShowResults(false);
     setSearchResults(null);
     listedSongs();
@@ -179,6 +170,11 @@ function Mainview() {
       top: 0,
     });
   }, [currentView]);
+
+  useEffect(() => {
+    setPage(1);
+    setMaxReached(false);
+  }, [currentPlayingPlaylist]);
 
   const listedSongs = () => {
     const songsArray = data.map((song, idx) => {
@@ -206,32 +202,6 @@ function Mainview() {
     currentView.view_name === "playlist"
       ? setSongsList(songsArray)
       : setSearchResults(songsArray);
-  };
-
-  const handleSearch = (searchQuery, field) => {
-    setLoading(true);
-    setField(field);
-    setSearchQuery(searchQuery);
-
-    searchQuery !== "" &&
-      axios
-        .get(
-          `${URL}/api/search?query=${searchQuery}&field=${field}&page=${page}`
-        )
-        .then((resp) => {
-          updateData(resp.data.content.results);
-          updateMaxPages(resp.data.content.max_page);
-          listedSongs();
-          setLoading(false);
-          setFocused(false);
-          setShowResults(true);
-        });
-
-    if (searchQuery === "") {
-      setLoading(false);
-      setSearchResults([]);
-      setShowResults(false);
-    }
   };
 
   const handleEdit = (values) => {
@@ -271,9 +241,19 @@ function Mainview() {
     setShowLyricsFullscreen(false);
   };
 
+  const handleSpace = (e) => {
+    if (e.key === " " && !searchFocused) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <>
-      <div className="mainview" ref={scrollRef}>
+      <div
+        className="mainview"
+        ref={scrollRef}
+        onKeyDown={(e) => handleSpace(e)}
+      >
         <div className="error-box-holder">
           <Box className="error-container">
             <Slide direction="down" in={checked} container={scrollRef.current}>
@@ -323,10 +303,10 @@ function Mainview() {
         {currentView.view_name && currentView.view_name === "search" && (
           <>
             <Search
-              handleSearch={(q, f) => handleSearch(q, f)}
               focused={focused}
               setFocused={(v) => setFocused(v)}
-              loading={loading}
+              setShowResults={(v) => setShowResults(v)}
+              setSearchResults={(v) => setSearchResults(v)}
             />
             {showResults && (
               <div className="list-container">
@@ -368,8 +348,8 @@ function Mainview() {
               {currentView.playlist_id !== 0 && selecting && (
                 <NoSongs page={page} />
               )}
-              {SongList.length > 5 && <div className="footing"></div>}
             </div>
+            {songsList.length > 10 && <div className="footing"></div>}
           </>
         )}
         {currentView.view_name && currentView.view_name === "home" && (

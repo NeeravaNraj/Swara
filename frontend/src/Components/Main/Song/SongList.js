@@ -29,13 +29,14 @@ function SongList(props) {
   const [areYouSureContent, setAreYouSureContent] = useState(null);
   const [download, setDownload] = useState(false);
   const [url, setUrl] = useState(null);
+  const [mouseOver, setMouseOver] = useState(false);
   const open = Boolean(anchorElement);
 
   const currentSong = useCurrentSong();
   const updateSong = UpdateCurrSong();
   const { currIsPlaying, updateIsPlaying, setSongname, setProvIndex } =
     useIsPlayingContext();
-  const { data, updateData } = useSongContext();
+  const { data, updateData, setSearchFocused } = useSongContext();
   const { currentView } = useViews();
   const { updateNumOfSongs } = useNumberOfSongs();
   const { allPlaylists } = useAllPlaylists();
@@ -139,6 +140,7 @@ function SongList(props) {
     props.editSong(props);
     setAnchorElement(null);
     setContextMenu(null);
+    setSearchFocused(true);
   };
 
   const handleDetails = () => {
@@ -188,7 +190,12 @@ function SongList(props) {
       {download && (
         <FileDownloader fileUrl={url} handleStop={handleStopDownload} />
       )}
-      <div className="song-container" onContextMenu={(e) => handleMenu(e)}>
+      <div
+        className="song-container"
+        onContextMenu={(e) => handleMenu(e)}
+        onMouseOver={() => setMouseOver(true)}
+        onMouseLeave={() => setMouseOver(false)}
+      >
         {showAreYouSure && (
           <AreYouSure
             open={showAreYouSure}
@@ -197,16 +204,41 @@ function SongList(props) {
             handleGoAhead={(v) => handleGoAhead(v)}
           />
         )}
-        <button className="play-btn" onClick={handleUpdate}>
-          {isPlaying ? (
-            <FaPause className="playpause-icon" />
+        <div className="play-index">
+          {mouseOver ? (
+            <button className="play-btn" onClick={handleUpdate}>
+              {isPlaying ? (
+                <FaPause className="playpause-icon" />
+              ) : (
+                <FaPlay className="playpause-icon" />
+              )}
+            </button>
           ) : (
-            <FaPlay className="playpause-icon" />
+            <div>
+              {props.id === currentSong && isPlaying ? (
+                <img
+                  src="https://i.giphy.com/media/JkRndDgMXLI9leeDCU/giphy.webp"
+                  className="playing-gif"
+                />
+              ) : (
+                <h3
+                  className="song-index"
+                  style={
+                    props.id === currentSong
+                      ? { color: "#FF7517" }
+                      : { color: "white" }
+                  }
+                >
+                  {props.index + 1}
+                </h3>
+              )}
+            </div>
           )}
-        </button>
+        </div>
         <div className="image-container">
           <FaMusic />
         </div>
+
         <div className="meta-container">
           <h2
             className="song-name"

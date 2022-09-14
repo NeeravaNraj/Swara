@@ -31,21 +31,24 @@ function AudioPlayer() {
   const [index, setIndex] = useState(undefined);
   const [songList, setSongList] = useState(null);
   const [view, setView] = useState(null);
-  const [currentPlayingPlaylist, setCurrentPlaylingPlaylist] = useState(0);
-  const [maxReached, setMaxReached] = useState(false);
+  const [playNext, setPlayNext] = useState(true);
+  const [playPrev, setPlayPrev] = useState(true);
   const [page, setPage] = useState(1);
+  const [maxReached, setMaxReached] = useState(false);
 
   const audioPlayer = useRef(); //References our audio component
   const progressBar = useRef(); //References out progress bar
   const animationRef = useRef(); //References knob
   const volumeBar = useRef(); //References volume component
 
-  const urlId = useCurrentSong(); // Song id to play
+  const urlId = useCurrentSong(); // current song id
+  const URL = useUrl();
+  const updatePage = useIsPlayingContext();
+
   const { numOfSongs } = useNumberOfSongs();
   const updateCurrSong = UpdateCurrSong();
   const { maxPages } = useMaxPages();
-  const URL = useUrl();
-  const { data, updateData } = useSongContext();
+  const { data, updateData, searchFocused } = useSongContext();
   const {
     currIsPlaying,
     updateIsPlaying,
@@ -53,8 +56,87 @@ function AudioPlayer() {
     setSongname,
     providerIndex,
     setProvIndex,
+    currentPlayingPlaylist,
+    setCurrentPlaylingPlaylist,
   } = useIsPlayingContext(); // State of song
   const { currentView } = useViews();
+
+  useEffect(() => {
+    if (songList) {
+      if (songList && index !== 0) {
+        setPlayPrev(true);
+      }
+      if (songList && index !== songList.length - 1) {
+        setPlayNext(true);
+      }
+      if (songList && index === 0) {
+        setPlayPrev(false);
+      }
+      if (songList.length - 1 === index) {
+        setPlayNext(false);
+      }
+      if (songList.length === 1) {
+        setPlayNext(false);
+        setPlayPrev(false);
+      }
+    }
+  }, [index, providerIndex, songList]);
+  const updateIndex = (idx, { song_name, song_type }) => {
+    setSongname({ name: song_name, type: song_type });
+    setIndex(idx);
+  };
+
+  const getIndex = () => {
+    data.map((song, idx) => {
+      if (index === undefined && String(song.song_id) === String(urlId)) {
+        updateIndex(idx, song);
+      } else if (
+        index === undefined &&
+        idx === data.length - 1 &&
+        String(song.song_id) !== String(urlId)
+      ) {
+        setPage((prev) => prev + 1);
+        updatePage.setPage((prev) => prev + 1);
+        if (!maxReached) {
+          axios
+            .get(
+              `${URL}/api/playlist/${currentPlayingPlaylist}?page=${page + 1}`
+            )
+            .then((resp) => {
+              if (resp.data.content.songs[0]) {
+                if (data.length !== numOfSongs) {
+                  updateData((prev) => prev.concat(resp.data.content.songs));
+                  setSongList((prev) => {
+                    if (!prev) {
+                      return resp.data.content.songs;
+                    } else {
+                      return prev.concat(resp.data.content.songs);
+                    }
+                  });
+                }
+              }
+            })
+            .catch(() => {
+              return;
+            });
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    const handleSpacebar = (e) => {
+      if (!searchFocused && e.key === " ") {
+        e.preventDefault();
+        updateIsPlaying((prev) => !prev);
+        setPlaying(!isPlaying);
+      }
+    };
+    document.addEventListener("keydown", handleSpacebar);
+    return () => {
+      document.removeEventListener("keydown", handleSpacebar);
+    };
+  }, [searchFocused]);
 
   useEffect(() => {
     if (typeof window !== undefined) {
@@ -98,56 +180,27 @@ function AudioPlayer() {
     if (urlId) {
       if (data[0]) {
         if (index === undefined) {
-          data.map((song, idx) => {
-            if (String(song.song_id) === String(urlId)) {
-              setIndex(idx);
-              setSongname({ name: song.song_name, type: song.song_type });
-            } else if (
-              idx === data.length - 1 &&
-              String(song.song_id) !== String(urlId)
-            ) {
-              setPage((prev) => prev + 1);
-              if (!maxReached) {
-                axios
-                  .get(
-                    `${URL}/api/playlist/${currentPlayingPlaylist}?page=${
-                      page + 1
-                    }`
-                  )
-                  .then((resp) => {
-                    if (resp.data.content.songs[0]) {
-                      if (data.length !== numOfSongs) {
-                        updateData((prev) =>
-                          prev.concat(resp.data.content.songs)
-                        );
-                        setSongList((prev) => {
-                          if (!prev) {
-                            return resp.data.content.songs;
-                          } else {
-                            return prev.concat(resp.data.content.songs);
-                          }
-                        });
-                      }
-                    }
-                  })
-                  .catch(() => {
-                    return;
-                  });
-              }
-            }
-          });
+          getIndex();
         }
       }
     }
   }, [urlId, data, page]);
 
   useEffect(() => {
+    if (songList && songList.length === numOfSongs) {
+      setPage(maxPages);
+      setMaxReached(true);
+    }
+  }, [songList]);
+
+  useEffect(() => {
     if (providerIndex !== undefined) {
       setIndex(providerIndex);
+      if (currIsPlaying) {
+        setPlaying(true);
+      }
       if (view) {
         setCurrentPlaylingPlaylist(view.playlist_id);
-        setPage(1);
-        setMaxReached(false);
         setProvIndex(undefined);
       }
     }
@@ -177,7 +230,7 @@ function AudioPlayer() {
         }
       }
     }
-  }, [data, numOfSongs]);
+  }, [data]);
 
   useEffect(() => {
     if (currentView) {
@@ -266,9 +319,9 @@ function AudioPlayer() {
       if (currIsPlaying) {
         songList[index] &&
           setDuration(Math.floor(Math.floor(songList[index].song_duration)));
-          audioPlayer.current.play();
-          animationRef.current = requestAnimationFrame(whilePlaying);
-          setPlaying(true);
+        audioPlayer.current.play();
+        animationRef.current = requestAnimationFrame(whilePlaying);
+        setPlaying(true);
       } else {
         audioPlayer.current.pause();
         cancelAnimationFrame(animationRef.current);
@@ -321,6 +374,7 @@ function AudioPlayer() {
               )
               .then((resp) => {
                 if (resp.data.content.songs[0]) {
+                  // console.log(page, resp.data.content.songs);
                   if (
                     view.playlist_id === currentPlayingPlaylist &&
                     data.length !== numOfSongs
@@ -355,8 +409,9 @@ function AudioPlayer() {
           if (songList[index].song_id === urlId) {
             let element;
             if (songList[index + 1] === undefined) {
-              element = songList[0];
-              setIndex(0);
+              updateIsPlaying(false);
+              setPlaying(false);
+              setEnded(false);
             } else {
               element = songList[index + 1];
               setIndex((prev) => prev + 1);
@@ -390,7 +445,10 @@ function AudioPlayer() {
           if (songList[index].song_id === urlId) {
             let element;
 
-            if (songList[index - 1] === undefined) {
+            if (
+              songList[index - 1] === undefined &&
+              songList.length === numOfSongs
+            ) {
               element = songList.at(-1);
               setIndex(songList.length - 1);
             } else {
@@ -418,7 +476,6 @@ function AudioPlayer() {
       return;
     }
   }, [prevEnded]);
-
 
   useEffect(() => {
     const handleResize = () => {
@@ -544,27 +601,29 @@ function AudioPlayer() {
   };
 
   const handlePlayNext = () => {
-    if (!currIsPlaying) {
-      setEnded(true);
-    }
-    if (currIsPlaying && isPlaying === true) {
-      setCurrentTime(duration);
+    if (songList && index !== songList.length - 1) {
+      if (!currIsPlaying) {
+        setEnded(true);
+      }
+      if (currIsPlaying && isPlaying === true) {
+        setCurrentTime(duration);
+      }
     }
   };
 
   const handlePlayPrev = () => {
-    audioPlayer?.current?.pause();
-    updateIsPlaying(false);
-    setPrevEnded(true);
+    if (songList && index !== 0) {
+      audioPlayer?.current?.pause();
+      updateIsPlaying(false);
+      setPrevEnded(true);
+    }
   };
-
   const handleSongChange = () => {
     if (currIsPlaying) {
       audioPlayer?.current?.play();
       animationRef.current = requestAnimationFrame(whilePlaying);
     }
   };
-
   return (
     <>
       <audio
@@ -596,7 +655,11 @@ function AudioPlayer() {
         <div className="progress-bar-container">
           <div className="buttons-container">
             {/* prev song */}
-            <button className="forward-backward" onClick={handlePlayPrev}>
+            <button
+              className="forward-backward"
+              style={{ color: playPrev ? "#fff" : "#a1a1a1" }}
+              onClick={handlePlayPrev}
+            >
               <FaStepBackward className="back" />
             </button>
 
@@ -606,7 +669,11 @@ function AudioPlayer() {
             </button>
 
             {/* next song */}
-            <button className="forward-backward" onClick={handlePlayNext}>
+            <button
+              className="forward-backward"
+              style={{ color: playNext ? "#fff" : "#a1a1a1" }}
+              onClick={handlePlayNext}
+            >
               <FaStepForward className="for" />
             </button>
           </div>
@@ -635,7 +702,6 @@ function AudioPlayer() {
           <input
             type="range"
             className="volume-bar"
-            // onScroll={(e) => handleVolScroll(e)}
             ref={volumeBar}
             onChange={changeVolume}
           />

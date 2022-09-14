@@ -3,12 +3,19 @@ import { Modal, Box, Slide } from "@mui/material";
 import "../../../Stylesheets/Settings.css";
 import SettingsSidebar from "./SettingsSidebar";
 import SettingsMain from "./SettingsMain";
+import { useSongContext } from "../../../Hooks/SongProvider";
 
 function SettingsWindow({ open, close, handleError, checked, error }) {
   const [settingsView, setSettingsView] = useState({ view_name: "type" });
+  const { setSearchFocused } = useSongContext();
+
+  const handleClose = () => {
+    close(false);
+    setSearchFocused(false);
+  };
 
   return (
-    <Modal open={open} onClose={() => close(false)} className="flex-reset">
+    <Modal open={open} onClose={handleClose} className="flex-reset">
       <>
         <Box className="error-container">
           <Slide direction="down" in={checked} mountOnEnter unmountOnExit>

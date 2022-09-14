@@ -5,15 +5,17 @@ import {
   useViews,
   useSongContext,
   useNumberOfSongs,
-  useUrl
+  useUrl,
+  useIsPlayingContext,
 } from "../../../Hooks/SongProvider";
 import axios from "axios";
 
 function Tile({ title, playlist_id }) {
   const { setCurrView } = useViews();
-  const { updateData } = useSongContext();
+  const { data, updateData } = useSongContext();
   const { updateNumOfSongs } = useNumberOfSongs();
-  const URL = useUrl()
+  const { page, currentPlayingPlaylist } = useIsPlayingContext();
+  const URL = useUrl();
 
   const handleClick = () => {
     setCurrView({
@@ -21,12 +23,14 @@ function Tile({ title, playlist_id }) {
       playlist_id: playlist_id,
       view_name: "playlist",
     });
-    axios
-      .get(`${URL}/api/playlist/` + String(playlist_id))
-      .then((resp) => {
-        updateData(resp.data.content.songs);
-        updateNumOfSongs(resp.data.content.numOfSongs);
-      });
+    if (playlist_id !== currentPlayingPlaylist) {
+      axios
+        .get(`${URL}/api/playlist/${playlist_id}`)
+        .then((resp) => {
+          updateData(resp.data.content.songs);
+          updateNumOfSongs(resp.data.content.numOfSongs);
+        });
+    }
   };
 
   return (

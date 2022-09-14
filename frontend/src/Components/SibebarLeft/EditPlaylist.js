@@ -6,7 +6,11 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material";
-import { useAllPlaylists, useUrl } from "../../Hooks/SongProvider";
+import {
+  useAllPlaylists,
+  useUrl,
+  useSongContext,
+} from "../../Hooks/SongProvider";
 import { TiTick } from "react-icons/ti";
 import { orange } from "@mui/material/colors";
 import axios from "axios";
@@ -22,6 +26,7 @@ const theme = createTheme({
 
 function EditPlaylist({ open, close, values }) {
   const { setAllPlaylists } = useAllPlaylists();
+  const { setSearchFocused } = useSongContext();
 
   const [plName, setPlName] = useState(values.pl_name);
   const [isUploaded, setUploaded] = useState(false);
@@ -60,11 +65,17 @@ function EditPlaylist({ open, close, values }) {
         setTimeout(() => setUploaded(false), 1000);
         makePlaylistNameChanges(updatedPlaylist);
         setUploaded(true);
+        setSearchFocused(false);
       });
   };
 
+  const handleClose = () => {
+    close(false);
+    setSearchFocused(false);
+  };
+
   return (
-    <Modal open={open} onClose={() => close(false)} className="flex-reset">
+    <Modal open={open} onClose={handleClose} className="flex-reset">
       {isUploaded ? (
         <div className="upload-success" onClick={() => close(false)}>
           <TiTick className="tick" />
@@ -94,7 +105,7 @@ function EditPlaylist({ open, close, values }) {
                   size="large"
                   color="error"
                   variant="outlined"
-                  onClick={() => close(false)}
+                  onClick={handleClose}
                 >
                   Close
                 </Button>

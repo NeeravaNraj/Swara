@@ -9,7 +9,11 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { useSearchData, useSongContext, useUrl } from "../../../../Hooks/SongProvider";
+import {
+  useSearchData,
+  useSongContext,
+  useUrl,
+} from "../../../../Hooks/SongProvider";
 import { TiTick } from "react-icons/ti";
 import { orange } from "@mui/material/colors";
 import axios from "axios";
@@ -41,8 +45,8 @@ function EditForm({ open, close, values }) {
   const [songTypeSearchData, setSongTypeSearchData] = useState([]);
 
   const [isUploaded, setUploaded] = useState(false);
-  const { data, updateData } = useSongContext();
-  const URL = useUrl()
+  const { updateData, setSearchFocused } = useSongContext();
+  const URL = useUrl();
 
   useEffect(() => {
     if (Object.values(searchData).length !== 0) {
@@ -101,11 +105,17 @@ function EditForm({ open, close, values }) {
         setTimeout(() => setUploaded(false), 1000);
         dataUpdation(newSongInfo[0]);
         setUploaded(true);
+        setSearchFocused(false);
       });
   };
 
+  const handleClose = () => {
+    close(false);
+    setSearchFocused(false);
+  };
+
   return (
-    <Modal open={open} onClose={() => close(false)} className="flex-reset">
+    <Modal open={open} onClose={handleClose} className="flex-reset">
       {isUploaded ? (
         <div className="upload-success" onClick={() => close(false)}>
           <TiTick className="tick" />
@@ -263,7 +273,7 @@ function EditForm({ open, close, values }) {
               />
               <div className="sub-close">
                 <Button
-                  onClick={() => close(false)}
+                  onClick={handleClose}
                   size="large"
                   color="error"
                   variant="outlined"

@@ -1,0 +1,41 @@
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background-color: rgb(55, 55, 55);
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.swara-img {
+  height: 80vh;
+}
+
+.author-text {
+  position: absolute;
+  bottom: 0;
+  margin: auto;
+  color: rgb(185, 185, 185);
+  margin-bottom: 3em;
+}
+
+.email{
+  position: absolute;
+  bottom: 0;
+  margin: auto;
+  color: rgb(185, 185, 185);
+  margin-bottom: 1em;
+}
+
+.linear-progress {
+  width: 50%;
+}

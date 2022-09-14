@@ -4,6 +4,14 @@ import { GoSearch } from "react-icons/go";
 import { CircularProgress } from "@mui/material";
 import ListItem from "./ListItem";
 import { HiDotsHorizontal } from "react-icons/hi";
+import {
+  SongContextProvider,
+  useIsPlayingContext,
+  useSongContext,
+  useUrl,
+} from "../../../../Hooks/SongProvider";
+
+import axios from "axios";
 
 const items = [
   { title: 'Search in "Song name"', colName: "song_name" },
@@ -14,10 +22,15 @@ const items = [
   { title: 'Search in "Tuned by"', colName: "tuner_name" },
 ];
 
-function Search({ handleSearch, focused, setFocused, loading }) {
+function Search({ focused, setFocused, setShowResults, setSearchResults }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selected, setSelected] = useState(undefined);
   const [currChecked, setChecked] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { page } = useIsPlayingContext();
+  const { updateData, setSearchFocused, searchFocused } = useSongContext();
+  const [field, setField] = useState("");
+  const URL = useUrl();
 
   const searchBar = useRef();
   const dropdown = useRef();
@@ -26,13 +39,51 @@ function Search({ handleSearch, focused, setFocused, loading }) {
     searchBar.current.focus();
   }, []);
 
+  useEffect(() => {
+    handleSearch(searchQuery, field);
+    if (selected === undefined) {
+      handleSearch(searchQuery, undefined);
+    }
+    if (selected !== undefined) {
+      handleSearch(searchQuery, selected);
+    }
+  }, [searchQuery]);
+
   const handleOnChange = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleSearch = (searchQuery, field) => {
+    setLoading(true);
+    setField(field);
+
+    if (searchQuery === "") {
+      setLoading(false);
+      setSearchResults([]);
+      setShowResults(false);
+    }
+
+    searchQuery !== "" &&
+      axios
+        .get(
+          `${URL}/api/search?query=${searchQuery}&field=${field}&page=${page}`
+        )
+        .then((resp) => {
+          updateData(resp.data.content.results);
+          setLoading(false);
+          setFocused(false);
+          setShowResults(true);
+        });
   };
 
   const OutsideClickHandle = (ref) => {
     useEffect(() => {
       const handleClickOutside = (e) => {
+        if (document.activeElement === searchBar.current) {
+          setSearchFocused(true);
+        } else {
+          setSearchFocused(false);
+        }
         if (dropdown.current && !ref.current.contains(e.target)) {
           setFocused(false);
         }
@@ -46,25 +97,34 @@ function Search({ handleSearch, focused, setFocused, loading }) {
   };
   OutsideClickHandle(dropdown);
 
-  useEffect(() => {
-    if (selected === undefined) {
-      handleSearch(searchQuery, undefined);
-    }
-    if (selected !== undefined) {
-      handleSearch(searchQuery, selected);
-    }
-  }, [searchQuery]);
+  const OutsideClickHandleSearch = (ref) => {
+    useEffect(() => {
+      const handleClickOutside = (e) => {
+        if (document.activeElement === searchBar.current) {
+          setSearchFocused(true);
+        } else {
+          setSearchFocused(false);
+        }
+      };
+      document.addEventListener("click", handleClickOutside);
+
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
+      };
+    }, [ref]);
+  };
+
+  OutsideClickHandleSearch(searchBar);
 
   const checkboxOnChange = (item) => {
     setSelected(item);
     setChecked(item);
 
-    if (currChecked === item){
-      setChecked(undefined)
-      setSelected(undefined)
+    if (currChecked === item) {
+      setChecked(undefined);
+      setSelected(undefined);
     }
   };
-
 
   return (
     <>
@@ -80,7 +140,7 @@ function Search({ handleSearch, focused, setFocused, loading }) {
           />
           <HiDotsHorizontal
             className="details"
-            onClick={() => setFocused(prev => !prev)}
+            onClick={() => setFocused((prev) => !prev)}
           />
         </div>
 

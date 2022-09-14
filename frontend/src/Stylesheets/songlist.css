@@ -10,12 +10,17 @@
   /* justify-content: space-between; */
 }
 
+.song-container:hover{
+  background-color: #414141;
+}
+
 .image-container {
   flex-shrink: 0;
   background-color: #ff7517;
   height: 50px;
   width: 50px;
-  margin-left: 1em;
+  margin-left: 1.2em;
+  margin-right: 1em;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,7 +28,6 @@
 }
 
 .meta-container {
-  margin-left: 1em;
   width: 20%;
   z-index: 3;
 }
@@ -39,13 +43,24 @@
   overflow: hidden;
 }
 
+.play-index{
+  width: 56px;
+}
+
+.playing-gif{
+  margin-left: 1.6em;
+  margin-top: 0.4em;
+  width: 20px;
+}
+
+
 .play-btn {
   border: none;
   background: none;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 1.2em;
+  margin-left: 1.4em;
   color: white;
   cursor: pointer;
   z-index: 3;
@@ -56,6 +71,16 @@
   font-size: 1rem;
   z-index: 3;
   color: rgb(221, 221, 221);
+  width: 24px;
+}
+
+.song-index{
+  text-align: center;
+  margin-left: 1em;
+  color: white;
+  font-weight: 400;
+  font-size: 1.2rem;
+  width: 32px;
 }
 
 .artist {
@@ -65,9 +90,6 @@
 }
 
 .raga {
-  /* margin-left: auto; */
-  /* position:relative;
-    left:10em; */
   position: absolute;
   width: 100%;
   display: flex;

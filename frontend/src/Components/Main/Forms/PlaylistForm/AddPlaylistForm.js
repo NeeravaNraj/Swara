@@ -3,8 +3,13 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import FormInputText from "../FormElements/FormInputText";
 import { Button } from "@mui/material";
-import { useShowPlaylistForm, useAllPlaylists, useUrl } from "../../../../Hooks/SongProvider";
-import {nanoid} from 'nanoid'
+import {
+  useShowPlaylistForm,
+  useAllPlaylists,
+  useUrl,
+  useSongContext,
+} from "../../../../Hooks/SongProvider";
+import { nanoid } from "nanoid";
 
 function AddPlaylistForm() {
   const { register, handleSubmit, control } = useForm({
@@ -14,7 +19,8 @@ function AddPlaylistForm() {
   });
   const { setShowPlaylist } = useShowPlaylistForm();
   const { setAllPlaylists } = useAllPlaylists();
-  const URL = useUrl()
+  const { setSearchFocused } = useSongContext();
+  const URL = useUrl();
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -27,6 +33,7 @@ function AddPlaylistForm() {
       })
       .then((res) => {
         setShowPlaylist(false);
+        setSearchFocused(false);
         return res;
       })
       .then((resp) =>
@@ -35,6 +42,7 @@ function AddPlaylistForm() {
   };
   const handleClose = () => {
     setShowPlaylist(false);
+    setSearchFocused(false);
   };
   return (
     <>

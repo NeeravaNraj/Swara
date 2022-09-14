@@ -1,6 +1,6 @@
 {
   "name": "swara",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Swara",
   "author": "Neerava <neerava.nraj@gmail.com>",
   "homepage": "./",
@@ -24,6 +24,7 @@
       "frontend/build/**/*",
       "backend/build/**/*",
       "node_modules/**/*",
+      "splashscreen/build/**/*",
       "frontend/package.json",
       "backend/package.json",
       "main.js",
@@ -39,7 +40,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "Swara-transparent.png"
+      "icon": "build/512x512.png"
     },
     "nsis": {
       "allowElevation": true,
@@ -54,7 +55,7 @@
       "target": [
         "deb"
       ],
-      "icon": "Swara-transparent.png"
+      "icon": "build/512x512.png"
     }
   },
   "dependencies": {

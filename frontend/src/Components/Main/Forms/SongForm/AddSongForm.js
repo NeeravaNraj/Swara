@@ -44,7 +44,7 @@ const AddSongForm = () => {
 
   const { setShow } = useFormShowContext();
   const { searchData } = useSearchData();
-  const { updateData } = useSongContext();
+  const { updateData, setSearchFocused } = useSongContext();
   const { updateNumOfSongs } = useNumberOfSongs();
   const URL = useUrl();
 
@@ -95,6 +95,7 @@ const AddSongForm = () => {
         setTimeout(() => setShow(false), 1000);
         setTimeout(() => setUploaded(false), 1000);
         setUploaded(true);
+        setSearchFocused(false);
         return res;
       })
       .then((resp) => {
@@ -106,6 +107,7 @@ const AddSongForm = () => {
           setIsError(false);
           setIsLoading(false);
           setShow(false);
+          setSearchFocused(false);
         }, 1000);
         setIsError(true);
         console.log(err);
@@ -115,6 +117,7 @@ const AddSongForm = () => {
   const onClickHandleFormClose = () => {
     setShow(false);
     setUploaded(false);
+    setSearchFocused(false);
   };
 
   const handleFileSubmit = () => {
