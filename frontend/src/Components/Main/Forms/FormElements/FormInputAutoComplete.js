@@ -17,12 +17,11 @@ const theme = createTheme({
   },
 });
 
-function FormInputAutoComplete({ name, control, label, options, required }) {
+function FormInputAutoComplete({ name, control, label, options, required, size }) {
   return (
     <Controller
       name={name}
       control={control}
-      defaultValue=""
       render={({ field: { ref, onChange, ...field } }) => {
         return (
           <ThemeProvider theme={theme}>
@@ -30,10 +29,10 @@ function FormInputAutoComplete({ name, control, label, options, required }) {
               options={options}
               freeSolo={true}
               fullWidth
-              autoSelect
+              // autoSelect
               onChange={(e, data) => onChange(data)}
               required={required}
-              // getOptionLabel={(option) => option || ""}
+              getOptionLabel={(option) => option || ""}
               renderInput={(params) => {
                 return (
                   <TextField
@@ -43,6 +42,7 @@ function FormInputAutoComplete({ name, control, label, options, required }) {
                     inputRef={ref}
                     required={required}
                     sx={{ mb: 2, width: "100%" }}
+                    size={size}
                   />
                 );
               }}

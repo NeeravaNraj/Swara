@@ -1,10 +1,6 @@
 import React from "react";
 import { Controller } from "react-hook-form";
-import {
-  TextField,
-  createTheme,
-  ThemeProvider,
-} from "@mui/material";
+import { TextField, createTheme, ThemeProvider } from "@mui/material";
 import { orange } from "@mui/material/colors";
 
 const theme = createTheme({
@@ -16,7 +12,17 @@ const theme = createTheme({
   },
 });
 
-function FormInputText({ name, label, control, multiline, rows, required, focused, maxRows }) {
+function FormInputText({
+  name,
+  label,
+  control,
+  multiline,
+  rows,
+  required,
+  focused,
+  maxRows,
+  size,
+}) {
   return (
     <Controller
       name={name}
@@ -39,6 +45,7 @@ function FormInputText({ name, label, control, multiline, rows, required, focuse
               required={required}
               autoFocus={focused}
               maxRows={maxRows}
+              size={size}
             />
           </ThemeProvider>
         );

@@ -35,6 +35,7 @@ function AudioPlayer() {
   const [playPrev, setPlayPrev] = useState(true);
   const [page, setPage] = useState(1);
   const [maxReached, setMaxReached] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(false);
 
   const audioPlayer = useRef(); //References our audio component
   const progressBar = useRef(); //References out progress bar
@@ -81,6 +82,7 @@ function AudioPlayer() {
       }
     }
   }, [index, providerIndex, songList]);
+
   const updateIndex = (idx, { song_name, song_type }) => {
     setSongname({ name: song_name, type: song_type });
     setIndex(idx);
@@ -139,31 +141,33 @@ function AudioPlayer() {
   }, [searchFocused]);
 
   useEffect(() => {
-    if (typeof window !== undefined) {
-      const prevId = localStorage.getItem("urlId");
-      (async () => {
-        if (prevId) {
-          await axios
-            .get(`${URL}/api/stream/${prevId}`, {
-              headers: {
-                Range: "bytes=0-1000",
-              },
-            })
-            .then(() => updateCurrSong(prevId))
-            .catch(() => updateCurrSong(""));
-        }
-      })();
-      volumeBar.current.value = localStorage.getItem("volume") * 100;
-      audioPlayer.current.volume = localStorage.getItem("volume");
-      progressBar.current.value = localStorage.getItem("prevTime");
-      audioPlayer.current.currentTime = localStorage.getItem("prevTime");
-      volumeBar.current.style.setProperty(
-        "--volume-before-width",
-        `${volumeBar.current.value}%`
-      );
+    if (!firstLoad)
+      if (typeof window !== undefined) {
+        const prevId = localStorage.getItem("urlId");
+        (async () => {
+          if (prevId) {
+            await axios
+              .get(`${URL}/api/stream/${prevId}`, {
+                headers: {
+                  Range: "bytes=0-1000",
+                },
+              })
+              .then(() => updateCurrSong(prevId))
+              .catch(() => updateCurrSong(""));
+          }
+        })();
+        volumeBar.current.value = localStorage.getItem("volume") * 100;
+        audioPlayer.current.volume = localStorage.getItem("volume");
+        progressBar.current.value = localStorage.getItem("prevTime");
+        audioPlayer.current.currentTime = localStorage.getItem("prevTime");
+        volumeBar.current.style.setProperty(
+          "--volume-before-width",
+          `${volumeBar.current.value}%`
+        );
 
-      changeVolSymbol(audioPlayer.current.volume);
-    }
+        changeVolSymbol(audioPlayer.current.volume);
+        setFirstLoad(true);
+      }
   }, []);
 
   useEffect(() => {
@@ -318,7 +322,7 @@ function AudioPlayer() {
     try {
       if (currIsPlaying) {
         songList[index] &&
-          setDuration(Math.floor(Math.floor(songList[index].song_duration)));
+          // setDuration(Math.floor(Math.floor(songList[index].song_duration)));
         audioPlayer.current.play();
         animationRef.current = requestAnimationFrame(whilePlaying);
         setPlaying(true);

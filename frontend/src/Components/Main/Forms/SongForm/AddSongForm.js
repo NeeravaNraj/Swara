@@ -1,7 +1,16 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import "../../../../Stylesheets/./Form.css";
-import { Button, Stack, Box, Slide, CircularProgress } from "@mui/material";
+import {
+  Button,
+  Stack,
+  Box,
+  Slide,
+  CircularProgress,
+  Switch,
+  FormGroup,
+  FormControlLabel,
+} from "@mui/material";
 import { TiTick } from "react-icons/ti";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import axios from "axios";
@@ -19,7 +28,6 @@ import FormInputAutoComplete from "../FormElements/FormInputAutoComplete";
 
 const AddSongForm = () => {
   const {
-    register,
     handleSubmit,
     control,
     formState: { errors },
@@ -38,6 +46,8 @@ const AddSongForm = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [images, setImages] = useState(null);
+  const [isTextLyrics, setIsTextLyrics] = useState(false);
 
   const [file, setFile] = useState(null);
   const [isUploaded, setUploaded] = useState(false);
@@ -59,7 +69,28 @@ const AddSongForm = () => {
   }, [searchData]);
 
   const fileChangeHandle = (e) => {
-    setFile(e.target.files[0]);
+    let file = e.target.files[0];
+    console.log(e.target.files);
+    if (file.type.split("/")[0] !== "audio")
+      handleError("Please upload an audio file!");
+    else setFile(e.target.files[0]);
+  };
+
+  const imageChangeHandle = (e) => {
+    let files = Object.values(e.target.files);
+    let count = 0;
+    console.log(files);
+    files.forEach((file) => {
+      if (file.type.split("/")[0] !== "image")
+        handleError("Please upload an image file!");
+      else count++;
+    });
+
+    if (count === files.length) setImages(files);
+  };
+
+  const handleModeChange = (_, v) => {
+    setIsTextLyrics(v);
   };
 
   const onSubmit = async (fdata) => {
@@ -69,20 +100,12 @@ const AddSongForm = () => {
     formData.append("song_name", fdata.song_name);
     formData.append("raga", fdata.raga);
     formData.append("song_type", fdata.song_type);
-    formData.append(
-      "tuned_by",
-      fdata.tuned_by === "" ? "unknown" : fdata.tuned_by
-    );
-    formData.append(
-      "composer",
-      fdata.composer === "" ? "unknown" : fdata.composer
-    );
-    formData.append(
-      "lyricist",
-      fdata.lyricist === "" ? "unknown" : fdata.lyricist
-    );
+    formData.append("tuned_by", !fdata.tuned_by ? "unknown" : fdata.tuned_by);
+    formData.append("composer", !fdata.composer ? "unknown" : fdata.composer);
+    formData.append("lyricist", !fdata.lyricist ? "unknown" : fdata.lyricist);
     formData.append("lyrics", fdata.lyrics);
     formData.append("song_path", file);
+    for (const file of images) formData.append("image_path", file);
 
     await axios
       .post(`${URL}/api/songs`, formData, {
@@ -237,16 +260,76 @@ const AddSongForm = () => {
                   />
                 </Stack>
 
-                <FormInputText
-                  name="lyrics"
-                  label={"Lyrics"}
-                  multiline={true}
-                  rows={3}
-                  control={control}
-                  required={false}
-                  focused={false}
-                  maxRows={6}
-                />
+                {!isTextLyrics ? (
+                  <div className="audio-file-related">
+                    <Button
+                      className="audio-file"
+                      component="label"
+                      variant="contained"
+                      color="warning"
+                      sx={{ mb: 1, mt: 1 }}
+                      size="small"
+                      required={true}
+                    >
+                      {images !== null ? (
+                        <TiTick className="tick smalltick" />
+                      ) : (
+                        <p style={{ margin: 0, padding: 0, fontWeight: 400 }}>
+                          Upload image
+                        </p>
+                      )}
+                      <input
+                        type="file"
+                        onChange={imageChangeHandle}
+                        name="image_path"
+                        hidden
+                        multiple
+                        accept=".png, .jpg, .jpeg"
+                      ></input>
+                    </Button>
+                    <FormGroup
+                      sx={{ position: "relative", top: "3px", color: "white" }}
+                    >
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            color="warning"
+                            onChange={handleModeChange}
+                            value={isTextLyrics}
+                          />
+                        }
+                        label={isTextLyrics ? "Lyrics photo" : "Lyrics text"}
+                      />
+                    </FormGroup>
+                  </div>
+                ) : (
+                  <>
+                    <FormInputText
+                      name="lyrics"
+                      label={"Lyrics"}
+                      multiline={true}
+                      rows={3}
+                      control={control}
+                      required={false}
+                      focused={false}
+                      maxRows={6}
+                    />
+                    <FormGroup
+                      sx={{ position: "relative", top: "3px", color: "white" }}
+                    >
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            color="warning"
+                            onChange={handleModeChange}
+                            defaultChecked={isTextLyrics}
+                          />
+                        }
+                        label={isTextLyrics ? "Lyrics photo" : "Lyrics text"}
+                      />
+                    </FormGroup>
+                  </>
+                )}
                 <div className="audio-file-related">
                   <Button
                     className="audio-file"
@@ -260,7 +343,9 @@ const AddSongForm = () => {
                     {file !== null ? (
                       <TiTick className="tick smalltick" />
                     ) : (
-                      "Upload audio file"
+                      <p style={{ margin: 0, padding: 0, fontWeight: 400 }}>
+                        Upload audio file
+                      </p>
                     )}
                     <input
                       type="file"

@@ -88,9 +88,9 @@ function EditForm({ open, close, values }) {
       song_type: type,
       song_raga: raga,
       song_lyrics: lyrics,
-      composer_name: composer,
-      lyricist_name: lyricist,
-      tuned_by: tuner,
+      composer_name: composer ? composer : "unknown",
+      lyricist_name: lyricist ? lyricist : "unknown",
+      tuned_by: tuner ? tuner : "unknown",
     };
 
     axios
