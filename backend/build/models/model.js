@@ -47,10 +47,10 @@ const db = knex(config);
 })();
 
 const seed = async () => {
-  try{
+  try {
     await db.seed.run();
-  }catch(err){
-    return
+  } catch (err) {
+    return;
   }
 };
 
@@ -230,8 +230,15 @@ const getIds = async (comp, lyr, tune, raga, type) => {
   };
 };
 
-const addSong = async (sentReq, route) => {
-  const file = String(path.join(route, sentReq.file.filename));
+const insertImagePath = async (id, path) => {
+  await db("image_table").insert({
+    song_id: id,
+    image_path: path,
+  });
+};
+
+const addSong = async (sentReq) => {
+  const file = sentReq.files.song_path[0].path;
   const {
     id,
     song_name,
@@ -272,10 +279,14 @@ const addSong = async (sentReq, route) => {
     composer_id: composer_id,
     song_lyrics: lyrics,
     lyricist_id: lyricist_id,
-    song_path: sentReq.file.filename,
+    song_path: sentReq.files.song_path[0].filename,
     song_duration: duration,
   };
-  insertIntoSongsTable(proto);
+  await insertIntoSongsTable(proto);
+  if (sentReq.files.image_path)
+    for (let i = 0; i < sentReq.files.image_path.length; i++) {
+      insertImagePath(id, sentReq.files.image_path[i].path);
+    }
 };
 
 const insertIntoSongsTable = async (record) => {
@@ -306,8 +317,8 @@ const all = async (page) => {
       "song_type_table.song_type_id",
       "songs_table.song_type_id"
     )
-    .limit(10)
-    .offset(page * 10 - 10);
+    .limit(25)
+    .offset(page * 25 - 25);
 
   const playlists = await db("playlist_table").select("*");
   const num = await db("songs_table").count();
@@ -315,7 +326,7 @@ const all = async (page) => {
   const all = {
     songs: songsall,
     playlists: playlists,
-    maxpages: Math.ceil(Object.values(num[0])[0] / 10 + 1),
+    maxpages: Math.ceil(Object.values(num[0])[0] / 25 + 1),
     numOfSongs: Object.values(num[0])[0],
   };
   if (all.songs[0] !== undefined) {
@@ -369,7 +380,7 @@ const preUpdateChecks = async (song_id, sentReq) => {
 };
 
 const getAllSongsOnly = async (page) => {
-  const pageNum = Number(page * 10 - 10);
+  const pageNum = Number(page * 25 - 25);
   const songs = await db("songs_table")
     .select("*")
     .leftJoin(
@@ -393,7 +404,7 @@ const getAllSongsOnly = async (page) => {
       "song_type_table.song_type_id",
       "songs_table.song_type_id"
     )
-    .limit(10)
+    .limit(25)
     .offset(pageNum);
 
   const num = await db("songs_table").count();
@@ -532,8 +543,8 @@ const getPlaylistSongs = async (playlistId, page) => {
       "song_type_table.song_type_id",
       "songs_table.song_type_id"
     )
-    .limit(10)
-    .offset(page * 10 - 10);
+    .limit(25)
+    .offset(page * 25 - 25);
 
   const numberOfSongs = await db("songs_table")
     .select("*")
@@ -764,6 +775,20 @@ const deleteMasterContent = async (masterType, id) => {
   }
 };
 
+const getImagePath = async (songid) => {
+  const path = await db("image_table")
+    .select("image_path")
+    .where({ song_id: songid });
+  return path;
+};
+
+const checkImages = async (songid) => {
+  const hasImages = await db("image_table").where({ song_id: songid }).count();
+  // hasImages return formate [{'count(*)': number}]
+  const count = Object.values(Object.values(hasImages[0]))[0];
+  return count;
+};
+
 module.exports = {
   addSong,
   all,
@@ -785,4 +810,6 @@ module.exports = {
   getMasterContent,
   updateMasterContent,
   deleteMasterContent,
+  getImagePath,
+  checkImages,
 };

@@ -20,6 +20,7 @@ const theme = createTheme({
   },
 });
 
+
 function SettingsMain({ view, handleError }) {
   const [selectedValue, setSelectedValue] = useState("");
   const [inputValue, setInputValue] = useState(null);
@@ -29,6 +30,7 @@ function SettingsMain({ view, handleError }) {
   const [selectedId, setSelectedId] = useState(null);
   const [areYouSureContent, setAreYouSure] = useState({});
   const [options, setOptions] = useState(null);
+  const [disableDelete, setDisableDelete] = useState(false);
 
   const URL = useUrl();
 
@@ -54,6 +56,11 @@ function SettingsMain({ view, handleError }) {
       optionGenerator();
     }
   }, [options]);
+
+  useEffect(() => {
+    if (inputValue !== Object.values(selectedValue).at(-1)) setDisableDelete(true);
+    else setDisableDelete(false);
+  }, [inputValue]);
 
   const optionGenerator = () => {
     if (options !== null) {
@@ -272,6 +279,7 @@ function SettingsMain({ view, handleError }) {
                 variant="contained"
                 size="small"
                 onClick={() => handleEditOrDelete("delete")}
+                disabled={disableDelete}
               >
                 Delete
               </Button>

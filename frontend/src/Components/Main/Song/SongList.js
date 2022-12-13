@@ -174,10 +174,26 @@ function SongList(props) {
     setContextMenu(null);
   };
 
-  const handleLyricShow = () => {
-    props.handleLyrics(props.lyrics);
-    setAnchorElement(null);
-    setContextMenu(null);
+  const hasImages = async () => {
+    const mp = await axios.get(`${URL}/api/imageCheck/${props.id}`);
+    const count = mp.data.count;
+    if (count === 0) return false;
+    if (count > 0) {
+      return {
+        count: count,
+      };
+    }
+  };
+
+  const handleLyricShow = async () => {
+    const has = await hasImages();
+    if (has) {
+      props.handleShowImages(props.id, has.count);
+    } else {
+      props.handleLyrics(props.lyrics);
+      setAnchorElement(null);
+      setContextMenu(null);
+    }
   };
 
   const handleStopDownload = () => {

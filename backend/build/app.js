@@ -12,6 +12,7 @@
   const osType = os.type();
 
   let fullAudioStoragePath;
+  let fullImageStoragePath;
   if (String(osType) === "Windows_NT") {
     const homedir = os.homedir();
     fullAudioStoragePath = path.join(
@@ -21,6 +22,13 @@
       "SwaraFiles",
       "AudioFiles"
     );
+    fullImageStoragePath = path.join(
+      String(homedir),
+      "AppData",
+      "Roaming",
+      "SwaraFiles",
+      "ImageFiles"
+    );
   }
   if (String(osType) === "Linux") {
     const homedir = os.homedir();
@@ -28,6 +36,11 @@
       String(homedir),
       ".SwaraFiles",
       "AudioFiles"
+    );
+    fullImageStoragePath = path.join(
+      String(homedir),
+      ".SwaraFiles",
+      "ImageFiles"
     );
   }
   if (String(osType) === "Darwin") {
@@ -37,7 +50,10 @@
 
   const fileStorageEngine = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, fullAudioStoragePath);
+      if (file.mimetype.split("/")[0] === "audio")
+        cb(null, fullAudioStoragePath);
+      else if (file.mimetype.split("/")[0] === "image")
+        cb(null, fullImageStoragePath);
     },
     filename: (req, file, cb) => {
       cb(null, Date.now() + "-" + file.originalname);
@@ -48,7 +64,15 @@
     storage: fileStorageEngine,
     fileFilter: (req, file, callback) => {
       let ext = path.extname(file.originalname);
-      if (ext !== ".mp3" && ext !== ".wav" && ext !== ".ogg" && ext !== ".m4a") {
+      if (
+        ext !== ".mp3" &&
+        ext !== ".wav" &&
+        ext !== ".ogg" &&
+        ext !== ".m4a" &&
+        ext !== ".png" &&
+        ext !== ".jpg" &&
+        ext !== ".jpeg"
+      ) {
         return callback(new Error("Only audio files allowed."));
       }
       callback(null, true);
@@ -57,6 +81,11 @@
 
   const urlencodedParser = bodyParser.urlencoded({ extended: false });
   const jsonParser = bodyParser.json();
+  const uploadFields = upload.fields([
+    { name: "song_path", maxCount: 1 },
+    { name: "image_path", maxCount: 10 },
+  ]);
+
   app.use(cors());
   app.use(express.json());
   app.use(urlencodedParser);
@@ -133,12 +162,61 @@
 
         audioStream.pipe(res);
       } catch (err) {
+        console.log(err);
         return;
       }
     };
     if (id !== "") {
       stream();
     }
+  });
+
+  app.get("/api/imageStream/:id/:imageNum", async (req, res) => {
+    const { id, imageNum } = req.params;
+    if (!id) res.status(400).send("Require song id!");
+    if (!imageNum) res.status(400).send("Require image number!");
+
+    const imagePath = await model.getImagePath(id);
+
+    if (imagePath.length === 0)
+      res.status(404).send("There is no image for this song.");
+
+    try {
+      const imageSize = fs.statSync(
+        String(imagePath[Number(imageNum)].image_path)
+      ).size;
+      const CHUNK_SIZE = 10 ** 6;
+      const start = 0;
+      const end = Math.min(start + CHUNK_SIZE, Number(imageSize) - 1);
+      const contentLength = end - start + 1;
+      const header = {
+        "Content-Range": `bytes ${start}-${end}/${imageSize}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": contentLength,
+        "Content-Type": "image/jpg",
+      };
+
+      res.writeHead(206, header);
+
+      const imageStream = fs.createReadStream(
+        String(imagePath[Number(imageNum)].image_path),
+        { start, end }
+      );
+
+      imageStream.pipe(res);
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  });
+
+  // returns the number of images of a particular song
+  app.get("/api/imageCheck/:id", async (req, res) => {
+    const { id } = req.params;
+    if (!id) res.status(400).send("Provide song id please!");
+    const hasImages = await model.checkImages(id);
+
+    res.status(200).json({ count: hasImages });
   });
 
   //get by id
@@ -155,13 +233,14 @@
   });
 
   //insert into songs table record
-  app.post("/api/songs", upload.single("song_path"), async (req, res) => {
+  app.post("/api/songs", uploadFields, async (req, res) => {
     const route = fullAudioStoragePath;
+    const imageRoute = fullImageStoragePath;
 
     const { id } = req.body;
 
     const returnRecord = async () => {
-      await model.addSong(req, route);
+      await model.addSong(req, route, imageRoute);
       const data = await model.getParticular(id);
       return res.status(200).json({ message: "ok", data: data });
     };
@@ -197,11 +276,25 @@
 
     const deleteFileRecord = async () => {
       const file = await getPath();
+      const hasImages = await model.checkImages(id);
+      let images;
       try {
         model.del(req.params.id);
-        fs.unlink(file, (err) => {
-          if (err) throw err;
-        });
+        try {
+          fs.unlink(file, (err) => {
+            if (err) console.log(err);
+          });
+          if (hasImages > 0) {
+            images = await model.getImagePath(id);
+            for (const image of images) {
+              fs.unlink(image.image_path, (err) => {
+                if (err) console.log(err);
+              });
+            }
+          }
+        } catch (err) {
+          console.log(err);
+        }
         res.status(200).json({
           message: `Record with id ${req.params.id} has been removed`,
         });

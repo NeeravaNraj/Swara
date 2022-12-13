@@ -11,7 +11,6 @@ exports.up = function (knex) {
         table.text("song_lyrics", 2048).nullable();
         table.integer("song_duration").notNullable();
         table.text("song_path", 512).notNullable();
-        table.text("isFavourite", 5).defaultTo("false");
         table
           .text("raga_id", 128)
           .notNullable()

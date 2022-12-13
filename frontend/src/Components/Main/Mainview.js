@@ -24,6 +24,7 @@ import Details from "./Song/Details";
 import { Slide, Box, Switch, FormControlLabel } from "@mui/material";
 import Lyrics from "./LyricsViews/Lyrics";
 import LyricsFullScreen from "./LyricsViews/LyricsFullScreen";
+import ImageViewer from "./LyricsViews/ImageViewer";
 
 function Mainview() {
   const { data, updateData, searchFocused } = useSongContext();
@@ -51,6 +52,9 @@ function Mainview() {
   const [showLyrics, setShowLyrics] = useState(false);
   const [lyrics, setLyrics] = useState(null);
   const [showLyricsFullscreen, setShowLyricsFullscreen] = useState(false);
+  const [showImages, setShowImages] = useState(false);
+  const [songImageId, setSongImageId] = useState("");
+  const [songImageMaxPages, setSongImageMaxPages] = useState(null);
 
   const [scrollRef, scrollPercentage] = useScrollPercentage();
 
@@ -142,6 +146,9 @@ function Mainview() {
                           songDetails={(v) => hanldeDetails(v)}
                           handleError={(err) => handleError(err)}
                           handleLyrics={(v) => handleLyrics(v)}
+                          handleShowImages={(id, mp) =>
+                            handleShowImages(id, mp)
+                          }
                         />
                       );
                     })
@@ -196,6 +203,8 @@ function Mainview() {
           songDetails={(v) => hanldeDetails(v)}
           handleError={(err) => handleError(err)}
           handleLyrics={(v) => handleLyrics(v)}
+          handleLyricsFullscreen={handleLyricsFullscreen}
+          handleShowImages={(id, mp) => handleShowImages(id, mp)}
         />
       );
     });
@@ -247,6 +256,24 @@ function Mainview() {
     }
   };
 
+  const handleShowImages = (songId, maxPages) => {
+    setSongImageId(songId);
+    setSongImageMaxPages(maxPages);
+    setPrevView(currentView);
+    setCurrView({
+      name: "lyrics",
+      playlist_id: null,
+      view_name: "image-lyrics",
+    });
+    setShowImages(true);
+  };
+
+  const handleCloseImages = () => {
+    setShowImages(false);
+    setCurrView(prevView);
+    setSongImageId("");
+    setShowImages(null);
+  };
   return (
     <>
       <div
@@ -272,6 +299,14 @@ function Mainview() {
           <LyricsFullScreen
             lyrics={lyrics}
             handleClose={handleFullscreenClose}
+          />
+        )}
+
+        {showImages && (
+          <ImageViewer
+            songId={songImageId}
+            maxPages={songImageMaxPages}
+            handleClose={handleCloseImages}
           />
         )}
 

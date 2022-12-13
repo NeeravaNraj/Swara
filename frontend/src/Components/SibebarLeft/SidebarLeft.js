@@ -26,7 +26,7 @@ function SidbarLeft() {
   const { setShow } = useFormShowContext();
   const { setShowPlaylist } = useShowPlaylistForm();
   const { allPlaylists, setAllPlaylists } = useAllPlaylists();
-  const { setCurrView } = useViews();
+  const { currentView, setCurrView } = useViews();
   const { updateData, setSearchFocused } = useSongContext();
   const { updateNumOfSongs } = useNumberOfSongs();
   const URL = useUrl();
@@ -36,6 +36,7 @@ function SidbarLeft() {
   const [showSettings, setShowSettings] = useState(false);
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState("");
+
   useEffect(() => {
     playlists();
   }, [allPlaylists]);
@@ -74,13 +75,16 @@ function SidbarLeft() {
 
   const handleSelectAll = (type) => {
     if (type === "songs") {
+      if (currentView.name === "Songs") return;
       handleSelect(0);
       setCurrView({ name: "Songs", playlist_id: 0, view_name: "playlist" });
     }
     if (type === "home") {
+      if (currentView.name === "Home") return;
       setCurrView({ name: "Home", playlist_id: null, view_name: "home" });
     }
     if (type === "search") {
+      if (currentView.name === "Search") return;
       setCurrView({ name: "Search", playlist_id: null, view_name: "search" });
     }
   };
@@ -143,7 +147,7 @@ function SidbarLeft() {
           </div>
           <div className="playlist-container">
             <h3 className="playlist-title">PLAYLISTS</h3>
-            {playlists()}
+            <div className="playlist-scroll">{playlists()}</div>
           </div>
         </div>
         <div className="settings-container">

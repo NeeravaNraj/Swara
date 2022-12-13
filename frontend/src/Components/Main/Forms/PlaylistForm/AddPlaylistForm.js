@@ -65,6 +65,7 @@ function AddPlaylistForm() {
                 label="Playlist name"
                 multiline={false}
                 required={true}
+                focused={true}
               />
               <div className="sub-close">
                 <Button

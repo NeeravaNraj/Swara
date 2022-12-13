@@ -275,6 +275,10 @@
   color: white;
 }
 
+.maxheight{
+  height: 90%;
+}
+
 .lyrics-box::-webkit-scrollbar{
   width: 0.6vw;
 }

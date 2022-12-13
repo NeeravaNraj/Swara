@@ -4,11 +4,11 @@ import { IoMdClose } from "react-icons/io";
 import { BsFullscreen, BsArrowsCollapse } from "react-icons/bs";
 
 function Lyrics({ lyrics, setShowLyrics, handleFullScreen }) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [lyricsWidth, setLyricsWidth] = useState({width: '100%'})
+  const [isShown, setIsShown] = useState(true);
+  const [lyricsWidth, setLyricsWidth] = useState({ width: "100%" });
 
   const handleCollapse = () => {
-    setIsCollapsed(!isCollapsed)
+    setIsShown(!isShown);
   };
 
   const handleClose = () => {
@@ -16,22 +16,22 @@ function Lyrics({ lyrics, setShowLyrics, handleFullScreen }) {
   };
 
   useEffect(() => {
-    if (!isCollapsed){
-      setTimeout(() => setLyricsWidth({width:'0%'}), 1000)
-    }if(isCollapsed){
-      setLyricsWidth({width:'30%'})
+    if (!isShown) {
+      setTimeout(() => setLyricsWidth({ width: "0%" }), 1000);
     }
-  },[isCollapsed])
+    if (isShown) {
+      setLyricsWidth({ width: "30%" });
+    }
+  }, [isShown]);
 
   useEffect(() => {
-    setIsCollapsed(true)
-  }, [lyrics])
-
+    setIsShown(true);
+  }, [lyrics]);
 
   return (
     <div className="all-lyrics-container" style={lyricsWidth}>
       <div className="lyrics-container">
-        {!isCollapsed && (
+        {!isShown && (
           <Box className="lyrics-control-collapsed">
             <IoMdClose
               className="lyrics-controls lyrics-close-btn"
@@ -48,7 +48,7 @@ function Lyrics({ lyrics, setShowLyrics, handleFullScreen }) {
           </Box>
         )}
         <Box className="lyrics-box-container">
-          <Slide direction="left" in={isCollapsed}>
+          <Slide direction="left" in={isShown}>
             <Box className="lyrics-box">
               <Box className="lyrics-control">
                 <IoMdClose

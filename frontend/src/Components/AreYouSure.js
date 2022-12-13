@@ -22,9 +22,9 @@ function AreYouSure({ open, close, values, handleGoAhead }) {
   const { method, name } = values;
 
   const handleGoAheadRuSure = () => {
-    handleGoAhead(method)
-    close(false)
-  }
+    handleGoAhead(method);
+    close(false);
+  };
 
   return (
     <Modal open={open} onClose={() => close(false)} className="flex-reset">

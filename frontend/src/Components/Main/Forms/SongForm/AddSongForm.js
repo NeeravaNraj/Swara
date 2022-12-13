@@ -45,8 +45,8 @@ const AddSongForm = () => {
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [images, setImages] = useState(null);
+  const [isError, setIsError] = useState(true);
+  const [images, setImages] = useState([]);
   const [isTextLyrics, setIsTextLyrics] = useState(false);
 
   const [file, setFile] = useState(null);
@@ -70,7 +70,6 @@ const AddSongForm = () => {
 
   const fileChangeHandle = (e) => {
     let file = e.target.files[0];
-    console.log(e.target.files);
     if (file.type.split("/")[0] !== "audio")
       handleError("Please upload an audio file!");
     else setFile(e.target.files[0]);
@@ -79,7 +78,6 @@ const AddSongForm = () => {
   const imageChangeHandle = (e) => {
     let files = Object.values(e.target.files);
     let count = 0;
-    console.log(files);
     files.forEach((file) => {
       if (file.type.split("/")[0] !== "image")
         handleError("Please upload an image file!");
@@ -271,7 +269,7 @@ const AddSongForm = () => {
                       size="small"
                       required={true}
                     >
-                      {images !== null ? (
+                      {images.length > 0 ? (
                         <TiTick className="tick smalltick" />
                       ) : (
                         <p style={{ margin: 0, padding: 0, fontWeight: 400 }}>

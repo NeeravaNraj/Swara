@@ -19,7 +19,7 @@ function Playlists(props) {
 
   const { allPlaylists, setAllPlaylists } = useAllPlaylists();
   const { currentView, setCurrView } = useViews();
-  const URL = useUrl()
+  const URL = useUrl();
 
   const handleDelete = async () => {
     const filteredData = allPlaylists.filter((playlist) => {
@@ -72,10 +72,10 @@ function Playlists(props) {
   };
 
   const handleGoAhead = (method) => {
-    if (method === 'delete'){
-      handleDelete()
+    if (method === "delete") {
+      handleDelete();
     }
-  }
+  };
 
   return (
     <>
@@ -119,7 +119,9 @@ function Playlists(props) {
             }
           >
             <MenuItem onClick={handleShowEditForm}>Edit playlist</MenuItem>
-            <MenuItem onClick={() => handleAreYouSure('delete')}>Delete playlist</MenuItem>
+            <MenuItem onClick={() => handleAreYouSure("delete")}>
+              Delete playlist
+            </MenuItem>
           </Menu>
         </ThemeProvider>
       </div>

@@ -1,0 +1,43 @@
+.image-viewer-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1em;
+}
+.image-viewer {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  min-width: 500px;
+}
+
+.lyrics-image {
+    width: 38vh;
+}
+
+.image-control-buttons {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em;
+  color: rgb(255, 255, 255);
+  transition: 0.2s;
+}
+
+.close-btn-image {
+  font-size: 2em;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 1em 2em;
+}
+
+.image-control-buttons:hover {
+  transform: scale(1.1);
+}
+
+.image-control-buttons:active {
+  transform: scale(0.98);
+}
