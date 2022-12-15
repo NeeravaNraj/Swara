@@ -13,6 +13,10 @@ import {
 } from "@mui/material";
 import { TiTick } from "react-icons/ti";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import {
+  BsFillArrowDownCircleFill,
+  BsFillArrowUpCircleFill,
+} from "react-icons/bs";
 import axios from "axios";
 import {
   useSongContext,
@@ -46,9 +50,10 @@ const AddSongForm = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(true);
-  const [images, setImages] = useState([]);
   const [isTextLyrics, setIsTextLyrics] = useState(false);
+  const [imageTbs, setImageTbs] = useState([]);
 
+  const [images, setImages] = useState([]);
   const [file, setFile] = useState(null);
   const [isUploaded, setUploaded] = useState(false);
 
@@ -68,6 +73,10 @@ const AddSongForm = () => {
     }
   }, [searchData]);
 
+  useEffect(() => {
+    getImageTbs();
+  }, [images]);
+
   const fileChangeHandle = (e) => {
     let file = e.target.files[0];
     if (file.type.split("/")[0] !== "audio")
@@ -75,7 +84,7 @@ const AddSongForm = () => {
     else setFile(e.target.files[0]);
   };
 
-  const imageChangeHandle = (e) => {
+  const imageChangeHandle = async (e) => {
     let files = Object.values(e.target.files);
     let count = 0;
     files.forEach((file) => {
@@ -85,6 +94,38 @@ const AddSongForm = () => {
     });
 
     if (count === files.length) setImages(files);
+    // getImageTbs();
+  };
+
+  const getImageTbs = async () => {
+    const imageTbArr = await Promise.all(
+      images.map(async (image) => {
+        const contents = await readFile(image);
+        return (
+          <img
+            key={nanoid(10)}
+            src={contents}
+            style={{
+              maxWidth: "256px",
+              maxHeight: "256px",
+              borderRadius: "5px",
+              display: "block",
+            }}
+          />
+        );
+      })
+    );
+    setImageTbs(imageTbArr);
+  };
+
+  const readFile = async (file) => {
+    return new Promise((res, rej) => {
+      let fr = new FileReader();
+      fr.onload = () => {
+        res(fr.result);
+      };
+      fr.readAsDataURL(file);
+    });
   };
 
   const handleModeChange = (_, v) => {
@@ -103,7 +144,8 @@ const AddSongForm = () => {
     formData.append("lyricist", !fdata.lyricist ? "unknown" : fdata.lyricist);
     formData.append("lyrics", fdata.lyrics);
     formData.append("song_path", file);
-    for (const file of images) formData.append("image_path", file);
+
+    for (const image of images) formData.append(`image_path`, image);
 
     await axios
       .post(`${URL}/api/songs`, formData, {
@@ -152,6 +194,36 @@ const AddSongForm = () => {
     setTimeout(() => setError(""), 2300);
     setError(error);
     setChecked(true);
+  };
+
+  const handleOrderUp = (orderNum) => {
+    let tempArr = images;
+
+    for (let i = 0; i < tempArr.length; i++) {
+      if (tempArr[i].lastModified === orderNum) {
+        let temp = tempArr[i - 1];
+        tempArr[i - 1] = tempArr[i];
+        tempArr[i] = temp;
+        break;
+      }
+    }
+    setImages(tempArr);
+    getImageTbs();
+  };
+
+  const handleOrderDown = (orderNum) => {
+    let tempArr = images;
+
+    for (let i = 0; i < tempArr.length; i++) {
+      if (tempArr[i].lastModified === orderNum) {
+        let temp = tempArr[i + 1];
+        tempArr[i + 1] = tempArr[i];
+        tempArr[i] = temp;
+        break;
+      }
+    }
+    setImages(tempArr);
+    getImageTbs();
   };
 
   return (
@@ -380,6 +452,40 @@ const AddSongForm = () => {
                   </Button>
                 </div>
               </form>
+            </div>
+          )}
+          {imageTbs.length > 0 && (
+            <div className="uploaded-images">
+              {imageTbs.map((image, idx) => {
+                return (
+                  <div className="image-wrapper" key={nanoid(10)}>
+                    {image}
+                    <p className="image-index">{idx + 1}</p>
+                    <div className="order-btns-wrapper">
+                      {idx !== 0 && (
+                        <button
+                          className="order-btns"
+                          onClick={() =>
+                            handleOrderUp(images[idx].lastModified)
+                          }
+                        >
+                          <BsFillArrowUpCircleFill />
+                        </button>
+                      )}
+                      {idx !== images.length - 1 && (
+                        <button
+                          className="order-btns"
+                          onClick={() =>
+                            handleOrderDown(images[idx].lastModified)
+                          }
+                        >
+                          <BsFillArrowDownCircleFill />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

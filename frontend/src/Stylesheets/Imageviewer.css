@@ -13,8 +13,49 @@
   min-width: 500px;
 }
 
+.imageview-container {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+  padding: 5em 0;
+}
+
 .lyrics-image {
-    width: 38vh;
+  position: absolute;
+  object-fit: cover;
+}
+
+.control-btn-group {
+  position: fixed;
+  bottom: 120px;
+  background-color: rgb(39, 39, 39);
+  display: flex;
+  gap: 0.5em;
+  border-radius: 5px;
+}
+
+.control-btns {
+  border-radius: 5px;
+  padding: 0.4em;
+  background-color: rgb(39, 39, 39);
+  border: none;
+  color: white;
+  font-size: 1.5em;
+  cursor: pointer;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.control-btns:hover {
+  background-color: rgb(114, 114, 114);
+}
+
+.control-btns:active {
+  transform: scale(0.98);
 }
 
 .image-control-buttons {
@@ -24,6 +65,22 @@
   font-size: 1.5em;
   color: rgb(255, 255, 255);
   transition: 0.2s;
+  display: flex;
+  position: relative;
+  z-index: 100;
+}
+
+.pagination-btns {
+  background-color: rgb(45, 45, 45);
+  border-radius: 50%;
+  padding: 0.5em;
+  align-self: center;
+}
+
+.zoomper {
+  color: white;
+  padding: 0 1em 0 0;
+  font-size: 0.8em;
 }
 
 .close-btn-image {

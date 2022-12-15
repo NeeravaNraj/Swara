@@ -2,7 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function(knex) {
+exports.up = function (knex) {
   knex.schema.hasTable("image_table").then((exists) => {
     if (!exists) {
       return knex.schema.createTable("image_table", (table) => {
@@ -11,9 +11,8 @@ exports.up = function(knex) {
           .notNullable()
           .references("song_id")
           .inTable("songs_table");
-        table
-          .text("image_path")
-          .notNullable()
+        table.text("image_path").notNullable();
+        table.integer("order").notNullable();
       });
     }
   });
@@ -23,6 +22,10 @@ exports.up = function(knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function(knex) {
-  
+exports.down = function (knex) {
+  knex.schema.hasTable("image_table").then((exists) => {
+    if (exists) {
+      return knex.schema.dropTable("image_table");
+    }
+  });
 };

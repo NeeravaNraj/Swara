@@ -176,16 +176,14 @@
     if (!id) res.status(400).send("Require song id!");
     if (!imageNum) res.status(400).send("Require image number!");
 
-    const imagePath = await model.getImagePath(id);
+    const imagePath = await model.getImagePath(id, imageNum);
 
     if (imagePath.length === 0)
       res.status(404).send("There is no image for this song.");
-
+    let fullpath = path.join(fullImageStoragePath, imagePath[0].image_path);
     try {
-      const imageSize = fs.statSync(
-        String(imagePath[Number(imageNum)].image_path)
-      ).size;
-      const CHUNK_SIZE = 10 ** 6;
+      const imageSize = fs.statSync(String(fullpath)).size;
+      const CHUNK_SIZE = 10 ** 10;
       const start = 0;
       const end = Math.min(start + CHUNK_SIZE, Number(imageSize) - 1);
       const contentLength = end - start + 1;
@@ -198,10 +196,7 @@
 
       res.writeHead(206, header);
 
-      const imageStream = fs.createReadStream(
-        String(imagePath[Number(imageNum)].image_path),
-        { start, end }
-      );
+      const imageStream = fs.createReadStream(String(fullpath), { start, end });
 
       imageStream.pipe(res);
     } catch (err) {

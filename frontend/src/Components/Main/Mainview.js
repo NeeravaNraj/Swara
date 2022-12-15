@@ -166,12 +166,18 @@ function Mainview() {
       setPage(1);
       setMaxReached(false);
     }
-    setShowResults(false);
-    setSearchResults(null);
-    listedSongs();
     if (currentView.view_name !== "fullscreen-lyrics") {
       setShowLyricsFullscreen(false);
     }
+    if (currentView.view_name !== "image-lyrics") {
+      setShowImages(false);
+      setSongImageId("");
+      setShowImages(null);
+    }
+    setShowResults(false);
+    setSearchResults(null);
+
+    listedSongs();
     const div = document.querySelector(".mainview");
     div.scrollTo({
       top: 0,
@@ -226,8 +232,10 @@ function Mainview() {
   const handleError = (error) => {
     setTimeout(() => setChecked(false), 1900);
     setTimeout(() => setError(""), 2100);
-    setError(error);
-    setChecked(true);
+    if (!checked) {
+      setError(error);
+      setChecked(true);
+    }
   };
 
   const handleLyrics = (lyrics) => {
@@ -270,9 +278,9 @@ function Mainview() {
 
   const handleCloseImages = () => {
     setShowImages(false);
-    setCurrView(prevView);
     setSongImageId("");
     setShowImages(null);
+    setCurrView(prevView);
   };
   return (
     <>
@@ -307,6 +315,7 @@ function Mainview() {
             songId={songImageId}
             maxPages={songImageMaxPages}
             handleClose={handleCloseImages}
+            handleError={(e) => handleError(e)}
           />
         )}
 

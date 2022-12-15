@@ -230,14 +230,16 @@ const getIds = async (comp, lyr, tune, raga, type) => {
   };
 };
 
-const insertImagePath = async (id, path) => {
+const insertImagePath = async (id, path, order) => {
   await db("image_table").insert({
     song_id: id,
     image_path: path,
+    order: order,
   });
 };
 
 const addSong = async (sentReq) => {
+  // console.log(sentReq);
   const file = sentReq.files.song_path[0].path;
   const {
     id,
@@ -285,7 +287,7 @@ const addSong = async (sentReq) => {
   await insertIntoSongsTable(proto);
   if (sentReq.files.image_path)
     for (let i = 0; i < sentReq.files.image_path.length; i++) {
-      insertImagePath(id, sentReq.files.image_path[i].path);
+      insertImagePath(id, sentReq.files.image_path[i].filename, i);
     }
 };
 
@@ -444,6 +446,7 @@ const update = async (id, changes) => {
 
 const del = async (id) => {
   await db("song_playlist_table").where({ song_id: id }).del();
+  await db("image_table").where({ song_id: id }).del();
   await db("songs_table").where({ song_id: id }).del();
 };
 
@@ -775,10 +778,10 @@ const deleteMasterContent = async (masterType, id) => {
   }
 };
 
-const getImagePath = async (songid) => {
+const getImagePath = async (songid, imageNum) => {
   const path = await db("image_table")
     .select("image_path")
-    .where({ song_id: songid });
+    .where({ song_id: songid, order: imageNum });
   return path;
 };
 

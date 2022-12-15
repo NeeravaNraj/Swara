@@ -49,6 +49,7 @@
   width: 100%;
   justify-content: center;
   align-items: center;
+  gap: 1em;
 }
 
 .sub-close {
@@ -82,15 +83,12 @@
 
 .form-scroll {
   background-color: #4b4646;
-  /* height: 65%; */
-  /* width: 20%; */
   width: 30%;
   padding: 6rem 3rem 0px;
   overflow: hidden;
   overflow-y: scroll;
   border-radius: 10px;
   position: relative;
-  /* bottom: 1rem; */
   scrollbar-width: none;
   z-index: 55;
 }
@@ -229,11 +227,11 @@
   color: white;
 }
 
-.success-text{
+.success-text {
   color: white;
 }
 
-.error-msg{
+.error-msg {
   color: rgb(174, 174, 174);
   font-size: 0.3em;
 }
@@ -315,6 +313,73 @@
 
 .file-selected {
   color: white;
+}
+
+.image-wrapper {
+  position: relative;
+}
+
+.uploaded-images {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: 1em;
+  position: relative;
+  z-index: 55;
+  padding: 1em;
+  background-color: #4b4646;
+  border-radius: 10px;
+  height: 60%;
+  min-height: 0;
+  min-width: 0;
+  align-items: center;
+}
+
+.order-btns-wrapper {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 35%;
+  right: 0;
+  margin-right: 0.6em;
+  gap: 0.5em;
+}
+
+.order-btns {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  align-self: center;
+  color: rgb(254, 254, 254);
+  cursor: pointer;
+}
+
+.image-index {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0.5em 0.6em 0 0;
+  background-color: rgb(253, 152, 45);
+  color: rgb(255, 255, 255);
+  border-radius: 50%;
+  height: 34px;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.uploaded-images::-webkit-scrollbar {
+  background-color: #292929;
+  border-radius: 10px;
+  width: 8px;
+}
+
+.uploaded-images::-webkit-scrollbar-thumb {
+  background-color: #727272;
+  border-radius: 10px;
 }
 
 @media screen and (max-width: 1400px) {

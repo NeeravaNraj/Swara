@@ -129,3 +129,21 @@
 .cog {
   font-size: 1.4em;
 }
+
+@media screen and (max-height: 900px) {
+  .playlist-scroll {
+    overflow-x: hidden;
+    height: 30vh;
+    width: 100%;
+    overflow-y: scroll;
+  }
+}
+
+@media screen and (max-height: 700px) {
+  .playlist-scroll {
+    overflow-x: hidden;
+    height: 15vh;
+    width: 100%;
+    overflow-y: scroll;
+  }
+}
