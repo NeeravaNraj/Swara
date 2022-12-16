@@ -32,9 +32,6 @@ const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
   useEffect(() => {
     setRotate(0);
     setMaxW(50);
-    setIsLarger(false);
-    setIsLargerH(false);
-    setChangingW(0);
   }, [page]);
 
   // useEffect(() => {
@@ -65,10 +62,7 @@ const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
   };
 
   const handleZoom = (incDec) => {
-    if (maxW !== 20)
-      if (!incDec) {
-        setMaxW(maxW - 10);
-      }
+    if (maxW !== 20) if (!incDec) setMaxW(maxW - 10);
     if (
       imgRef?.current?.width === imgRef?.current?.naturalWidth &&
       incDec === true
@@ -114,9 +108,6 @@ const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
               style={{
                 transform: `rotate(${rotate}deg)`,
                 maxWidth: `${maxW}vh`,
-                top: isLargerH ? "35%" : isLarger ? 0 : "",
-                marginTop: isLarger ? "5em" : "",
-                marginBottom: isLarger ? "5em" : "",
               }}
             />
           </div>

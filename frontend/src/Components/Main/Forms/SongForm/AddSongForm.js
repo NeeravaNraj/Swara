@@ -10,9 +10,12 @@ import {
   Switch,
   FormGroup,
   FormControlLabel,
+  Modal,
+  IconButton,
 } from "@mui/material";
 import { TiTick } from "react-icons/ti";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import { IoMdAddCircle, IoMdCloseCircle } from "react-icons/io";
 import {
   BsFillArrowDownCircleFill,
   BsFillArrowUpCircleFill,
@@ -29,6 +32,7 @@ import { useForm } from "react-hook-form";
 import { nanoid } from "nanoid";
 import FormInputText from "../FormElements/FormInputText";
 import FormInputAutoComplete from "../FormElements/FormInputAutoComplete";
+import ImagePreview from "./ImagePreview";
 
 const AddSongForm = () => {
   const {
@@ -49,9 +53,11 @@ const AddSongForm = () => {
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [isTextLyrics, setIsTextLyrics] = useState(false);
   const [imageTbs, setImageTbs] = useState([]);
+  const [viewImg, setViewImg] = useState(false);
+  const [viewImgSrc, setViewImgSrc] = useState("");
 
   const [images, setImages] = useState([]);
   const [file, setFile] = useState(null);
@@ -93,24 +99,31 @@ const AddSongForm = () => {
       else count++;
     });
 
-    if (count === files.length) setImages(files);
-    // getImageTbs();
+    const fileObjs = files.map((file, idx) => {
+      return {
+        file: file,
+        order: idx,
+      };
+    });
+
+    if (count === files.length) setImages(fileObjs);
   };
 
   const getImageTbs = async () => {
     const imageTbArr = await Promise.all(
-      images.map(async (image) => {
-        const contents = await readFile(image);
+      images.map(async (image, idx) => {
+        const contents = await readFile(image.file);
         return (
-          <img
+          <ImagePreview
             key={nanoid(10)}
             src={contents}
             style={{
               maxWidth: "256px",
               maxHeight: "256px",
               borderRadius: "5px",
-              display: "block",
             }}
+            openImg={() => handleImgIdx(idx)}
+            removeImg={() => removeImg(idx)}
           />
         );
       })
@@ -145,7 +158,8 @@ const AddSongForm = () => {
     formData.append("lyrics", fdata.lyrics);
     formData.append("song_path", file);
 
-    for (const image of images) formData.append(`image_path`, image);
+    for (const image of images) formData.append(`image_path`, image.file);
+    setImageTbs([]);
 
     await axios
       .post(`${URL}/api/songs`, formData, {
@@ -158,11 +172,9 @@ const AddSongForm = () => {
         setTimeout(() => setShow(false), 1000);
         setTimeout(() => setUploaded(false), 1000);
         setUploaded(true);
+        setIsLoading(true);
         setSearchFocused(false);
-        return res;
-      })
-      .then((resp) => {
-        updateData((prev) => [...prev, resp.data.data[0]]);
+        updateData((prev) => [...prev, res.data.data[0]]);
         updateNumOfSongs((prev) => prev + 1);
       })
       .catch((err) => {
@@ -200,10 +212,10 @@ const AddSongForm = () => {
     let tempArr = images;
 
     for (let i = 0; i < tempArr.length; i++) {
-      if (tempArr[i].lastModified === orderNum) {
-        let temp = tempArr[i - 1];
-        tempArr[i - 1] = tempArr[i];
-        tempArr[i] = temp;
+      if (tempArr[i].order === orderNum) {
+        let temp = tempArr[i - 1].file;
+        tempArr[i - 1].file = tempArr[i].file;
+        tempArr[i].file = temp;
         break;
       }
     }
@@ -215,15 +227,57 @@ const AddSongForm = () => {
     let tempArr = images;
 
     for (let i = 0; i < tempArr.length; i++) {
-      if (tempArr[i].lastModified === orderNum) {
-        let temp = tempArr[i + 1];
-        tempArr[i + 1] = tempArr[i];
-        tempArr[i] = temp;
+      if (tempArr[i].order === orderNum) {
+        let temp = tempArr[i + 1].file;
+        tempArr[i + 1].file = tempArr[i].file;
+        tempArr[i].file = temp;
         break;
       }
     }
     setImages(tempArr);
     getImageTbs();
+  };
+
+  const handleImageView = (show) => {
+    setViewImg(show);
+  };
+
+  const handleImgIdx = async (idx) => {
+    readFile(images[idx].file).then((data) => {
+      setViewImgSrc(data);
+      handleImageView(true);
+    });
+  };
+
+  // console.log(images)
+
+  const removeImg = (idx) => {
+    setImages((prev) => {
+      return prev.filter((image, _, arr) => {
+        if (image.order !== arr[idx].order) {
+          return image;
+        }
+      });
+    });
+  };
+
+  const addImage = (e) => {
+    let files = Object.values(e.target.files);
+    let count = 0;
+    files.forEach((file) => {
+      if (file.type.split("/")[0] !== "image")
+        handleError("Please upload an image file!");
+      else count++;
+    });
+
+    const fileObjs = files.map((file, idx) => {
+      return {
+        file: file,
+        order: images.length + idx,
+      };
+    });
+
+    if (count === files.length) setImages((prev) => [...prev, ...fileObjs]);
   };
 
   return (
@@ -241,6 +295,21 @@ const AddSongForm = () => {
           </Slide>
         </Box>
       </div>
+      <Modal
+        open={viewImg}
+        onClose={() => handleImageView(false)}
+        className="flex-reset"
+      >
+        <img
+          src={viewImgSrc}
+          style={{
+            maxWidth: "80vh",
+            maxHeight: "80vh",
+            borderRadius: "10px",
+            display: "block",
+          }}
+        />
+      </Modal>
       <div className="background" onClick={onClickHandleFormClose}></div>
       <div className="form-container">
         <div className="flex-reset">
@@ -332,31 +401,33 @@ const AddSongForm = () => {
 
                 {!isTextLyrics ? (
                   <div className="audio-file-related">
-                    <Button
-                      className="audio-file"
-                      component="label"
-                      variant="contained"
-                      color="warning"
-                      sx={{ mb: 1, mt: 1 }}
-                      size="small"
-                      required={true}
-                    >
-                      {images.length > 0 ? (
-                        <TiTick className="tick smalltick" />
-                      ) : (
-                        <p style={{ margin: 0, padding: 0, fontWeight: 400 }}>
-                          Upload image
-                        </p>
-                      )}
-                      <input
-                        type="file"
-                        onChange={imageChangeHandle}
-                        name="image_path"
-                        hidden
-                        multiple
-                        accept=".png, .jpg, .jpeg"
-                      ></input>
-                    </Button>
+                    {!images.length && (
+                      <Button
+                        className="audio-file"
+                        component="label"
+                        variant="contained"
+                        color="warning"
+                        sx={{ mb: 1, mt: 1 }}
+                        size="small"
+                        required={true}
+                      >
+                        {images.length > 0 ? (
+                          <TiTick className="tick smalltick" />
+                        ) : (
+                          <p style={{ margin: 0, padding: 0, fontWeight: 400 }}>
+                            Upload image
+                          </p>
+                        )}
+                        <input
+                          type="file"
+                          onChange={imageChangeHandle}
+                          name="image_path"
+                          hidden
+                          multiple
+                          accept=".png, .jpg, .jpeg"
+                        ></input>
+                      </Button>
+                    )}
                     <FormGroup
                       sx={{ position: "relative", top: "3px", color: "white" }}
                     >
@@ -465,9 +536,7 @@ const AddSongForm = () => {
                       {idx !== 0 && (
                         <button
                           className="order-btns"
-                          onClick={() =>
-                            handleOrderUp(images[idx].lastModified)
-                          }
+                          onClick={() => handleOrderUp(images[idx].order)}
                         >
                           <BsFillArrowUpCircleFill />
                         </button>
@@ -475,9 +544,7 @@ const AddSongForm = () => {
                       {idx !== images.length - 1 && (
                         <button
                           className="order-btns"
-                          onClick={() =>
-                            handleOrderDown(images[idx].lastModified)
-                          }
+                          onClick={() => handleOrderDown(images[idx].order)}
                         >
                           <BsFillArrowDownCircleFill />
                         </button>
@@ -486,6 +553,16 @@ const AddSongForm = () => {
                   </div>
                 );
               })}
+              <IconButton className="add-image" component="label">
+                <IoMdAddCircle />
+                <input
+                  type="file"
+                  onChange={addImage}
+                  hidden
+                  multiple
+                  accept=".png, .jpg, .jpeg"
+                />
+              </IconButton>
             </div>
           )}
         </div>

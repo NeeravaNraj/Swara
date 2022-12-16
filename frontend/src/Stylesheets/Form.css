@@ -330,7 +330,7 @@
   padding: 1em;
   background-color: #4b4646;
   border-radius: 10px;
-  height: 60%;
+  max-height: 60%;
   min-height: 0;
   min-width: 0;
   align-items: center;
@@ -344,6 +344,7 @@
   right: 0;
   margin-right: 0.6em;
   gap: 0.5em;
+  z-index: 5;
 }
 
 .order-btns {
@@ -369,6 +370,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  z-index: 5;
 }
 
 .uploaded-images::-webkit-scrollbar {
@@ -382,18 +384,126 @@
   border-radius: 10px;
 }
 
+.img-preview-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.open-image {
+  background-color: orange;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  padding: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  cursor: pointer;
+  /* transition: 0.2s; */
+}
+
+.open-image:hover {
+  background-color: rgb(224, 146, 1);
+}
+
+.open-image:active {
+  transform: scale(0.99);
+}
+
+.img-hover {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* transition: 0.2s; */
+  z-index: 5;
+}
+
+.add-image {
+  background: none;
+  border: none;
+  font-size: 2.2em;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: rgb(195, 195, 195);
+  transition: 0.2s;
+}
+
+.add-image:hover {
+  color: rgb(216, 216, 216);
+}
+
+.add-image:active {
+  transform: scale(0.98);
+}
+
+.remove-img-btn {
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  align-self: center;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  border-radius: 50%;
+  z-index: 5;
+}
+
+.remove-img-btn:hover {
+  color: rgb(228, 228, 228);
+}
+
+.remove-btn-container {
+  width: 100%;
+  background-color: rgb(56, 56, 56);
+  display: flex;
+  justify-content: center;
+  padding: 0.6em 0;
+  border-radius: 0 0 10px 10px;
+  position: relative;
+  bottom: 2px;
+}
+
+.remove-btn {
+  border: none;
+  border-radius: 5px;
+  padding: 0.4em 1em;
+  background-color: rgb(255, 70, 70);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background-color: rgb(230, 63, 63);
+}
+
+.remove-btn:active {
+  transform: scale(0.98);
+  /* background-color: rgb(216, 60, 60); */
+}
+
 @media screen and (max-width: 1400px) {
   .form-scroll {
     background-color: #4b4646;
-    /* height: 65%; */
-    /* width: 20%; */
     width: 40%;
     padding: 6rem 3rem 0px;
     overflow: hidden;
     overflow-y: scroll;
     border-radius: 10px;
     position: relative;
-    /* bottom: 1rem; */
     scrollbar-width: none;
     z-index: 55;
   }

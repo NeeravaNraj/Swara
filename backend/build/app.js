@@ -8,11 +8,12 @@
   const path = require("path");
   const fs = require("fs");
   const os = require("node:os");
+  const { nanoid } = require("nanoid");
 
   const osType = os.type();
-
   let fullAudioStoragePath;
   let fullImageStoragePath;
+  let imageParentFolder;
   if (String(osType) === "Windows_NT") {
     const homedir = os.homedir();
     fullAudioStoragePath = path.join(
@@ -44,6 +45,17 @@
     );
   }
   if (String(osType) === "Darwin") {
+    const homedir = os.homedir();
+    fullAudioStoragePath = path.join(
+      String(homedir),
+      ".SwaraFiles",
+      "AudioFiles"
+    );
+    fullImageStoragePath = path.join(
+      String(homedir),
+      ".SwaraFiles",
+      "ImageFiles"
+    );
   }
 
   const app = express();
@@ -52,13 +64,21 @@
     destination: (req, file, cb) => {
       if (file.mimetype.split("/")[0] === "audio")
         cb(null, fullAudioStoragePath);
-      else if (file.mimetype.split("/")[0] === "image")
-        cb(null, fullImageStoragePath);
+      else if (file.mimetype.split("/")[0] === "image") {
+        let id = req.body.id;
+        const imgPath = path.join(fullImageStoragePath, id);
+        try {
+          fs.mkdirSync(imgPath);
+        } catch (err) {}
+        cb(null, imgPath);
+      }
     },
     filename: (req, file, cb) => {
       cb(null, Date.now() + "-" + file.originalname);
     },
   });
+
+
 
   const upload = multer({
     storage: fileStorageEngine,
@@ -75,6 +95,7 @@
       ) {
         return callback(new Error("Only audio files allowed."));
       }
+      // console.log("test")
       callback(null, true);
     },
   });
@@ -229,13 +250,10 @@
 
   //insert into songs table record
   app.post("/api/songs", uploadFields, async (req, res) => {
-    const route = fullAudioStoragePath;
-    const imageRoute = fullImageStoragePath;
-
     const { id } = req.body;
 
     const returnRecord = async () => {
-      await model.addSong(req, route, imageRoute);
+      await model.addSong(req);
       const data = await model.getParticular(id);
       return res.status(200).json({ message: "ok", data: data });
     };

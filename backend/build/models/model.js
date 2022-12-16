@@ -239,7 +239,6 @@ const insertImagePath = async (id, path, order) => {
 };
 
 const addSong = async (sentReq) => {
-  // console.log(sentReq);
   const file = sentReq.files.song_path[0].path;
   const {
     id,
@@ -287,7 +286,11 @@ const addSong = async (sentReq) => {
   await insertIntoSongsTable(proto);
   if (sentReq.files.image_path)
     for (let i = 0; i < sentReq.files.image_path.length; i++) {
-      insertImagePath(id, sentReq.files.image_path[i].filename, i);
+      insertImagePath(
+        id,
+        path.join(id, sentReq.files.image_path[i].filename),
+        i
+      );
     }
 };
 
