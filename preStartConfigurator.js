@@ -5,6 +5,15 @@ const fs = require("fs");
 const os = require("node:os");
 const osType = os.type();
 
+const createDir = (path, shout) => {
+  fs.mkdirSync(path, (err) => {
+    if (err) throw err;
+    else {
+      console.log(shout);
+    }
+  });
+};
+
 if (String(osType) === "Windows_NT") {
   const homedir = os.homedir();
   const fullSwaraWinStoragePath = path.join(
@@ -15,39 +24,15 @@ if (String(osType) === "Windows_NT") {
   );
   const dirExists = fs.existsSync(fullSwaraWinStoragePath);
   if (!dirExists) {
-    fs.mkdir(String(fullSwaraWinStoragePath), (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Made SwaraFiles");
-      }
-    });
-
-    fs.mkdir(
-      path.join(String(fullSwaraWinStoragePath), "AudioFiles"),
-      (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Made AudioFiles");
-        }
-      }
+    createDir(fullSwaraWinStoragePath, "Made SwaraFiles");
+    createDir(
+      path.join(fullSwaraWinStoragePath, "AudioFiles"),
+      "Made AudioFiles"
     );
-
-    fs.mkdir(path.join(String(fullSwaraWinStoragePath), "db"), (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Made db");
-      }
-    });
-
-    fs.mkdir(
-      path.join(String(fullSwaraWinStoragePath), "ImageFiles"),
-      (err) => {
-        if (err) console.log(err);
-        else console.log("Made ImageFiles");
-      }
+    createDir(path.join(fullSwaraWinStoragePath, "db"), "Made db");
+    createDir(
+      path.join(fullSwaraWinStoragePath, "ImageFiles"),
+      "Made ImageFiles"
     );
   }
   if (dirExists) {
@@ -70,31 +55,16 @@ if (String(osType) === "Windows_NT") {
       console.log("Files already exist, Cheers!");
       return;
     } else if (!checkInSwaraAudioFiles) {
-      fs.mkdir(
+      createDir(
         path.join(String(fullSwaraWinStoragePath), "AudioFiles"),
-        (err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Made AudioFiles");
-          }
-        }
+        "Made AudioFiles"
       );
     } else if (!checkInSwaraDBFile) {
-      fs.mkdir(path.join(String(fullSwaraWinStoragePath), "db"), (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Made db");
-        }
-      });
+      createDir(path.join(String(fullSwaraWinStoragePath), "db"), "Made db");
     } else if (!checkInSwaraImageFiles) {
-      fs.mkdir(
+      createDir(
         path.join(String(fullSwaraWinStoragePath), "ImageFiles"),
-        (err) => {
-          if (err) console.log(err);
-          else console.log("Made ImageFiles");
-        }
+        "Made ImageFiles"
       );
     }
   }
@@ -105,37 +75,16 @@ if (String(osType) === "Linux") {
   const fullSwaraLinuxStoragePath = path.join(String(homedir), ".SwaraFiles");
   const dirExists = fs.existsSync(fullSwaraLinuxStoragePath);
   if (!dirExists) {
-    fs.mkdir(String(fullSwaraLinuxStoragePath), (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Made SwaraFiles");
-      }
-    });
-
-    fs.mkdir(
-      path.join(String(fullSwaraLinuxStoragePath), "AudioFiles"),
-      (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Made AudioFiles");
-        }
-      }
+    createDir(fullSwaraLinuxStoragePath, "Made SwaraFiles");
+    createDir(
+      path.join(fullSwaraLinuxStoragePath, "AudioFiles"),
+      "Made AudioFiles"
     );
-
-    fs.mkdir(path.join(String(fullSwaraLinuxStoragePath), "db"), (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Made db");
-      }
-    });
-
-    fs.mkdir(path.join(fullSwaraLinuxStoragePath), "ImageFiles", (err) => {
-      if (err) console.log(err);
-      else console.log("Made ImageFiles");
-    });
+    createDir(path.join(fullSwaraLinuxStoragePath, "db"), "Made db");
+    createDir(
+      path.join(fullSwaraLinuxStoragePath, "ImageFiles"),
+      "Made ImageFiles"
+    );
   }
   if (dirExists) {
     const checkInSwaraAudioFiles = fs.existsSync(
@@ -153,31 +102,63 @@ if (String(osType) === "Linux") {
       console.log("Files already exist, Cheers!");
       return;
     } else if (!checkInSwaraAudioFiles) {
-      fs.mkdir(
-        path.join(String(fullSwaraLinuxStoragePath), "AudioFiles"),
-        (err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Made AudioFiles");
-          }
-        }
+      createDir(
+        path.join(fullSwaraLinuxStoragePath, "AudioFiles"),
+        "Made AudioFiles"
       );
     } else if (!checkInSwaraDBFile) {
-      fs.mkdir(path.join(String(fullSwaraLinuxStoragePath), "db"), (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Made db");
-        }
-      });
+      createDir(path.join(fullSwaraLinuxStoragePath, "db"), "Made db");
     } else if (!checkInSwaraImageFiles) {
-      fs.mkdir(path.join(fullSwaraLinuxStoragePath), "ImageFiles", (err) => {
-        if (err) console.log(err);
-        else console.log("Made ImageFiles");
-      });
+      createDir(
+        path.join(fullSwaraLinuxStoragePath, "ImageFiles"),
+        "Made ImageFiles"
+      );
     }
   }
 }
 if (String(osType) === "Darwin") {
+  const homedir = os.homedir();
+  const fullSwaraMacStoragePath = path.join(String(homedir), ".SwaraFiles");
+  const dirExists = fs.existsSync(fullSwaraMacStoragePath);
+  if (!dirExists) {
+    createDir(fullSwaraMacStoragePath, "Made SwaraFiles");
+    createDir(
+      path.join(fullSwaraMacStoragePath, "AudioFiles"),
+      "Made AudioFiles"
+    );
+    createDir(path.join(fullSwaraMacStoragePath, "db"), "Made db");
+    createDir(
+      path.join(fullSwaraMacStoragePath, "ImageFiles"),
+      "Made ImageFiles"
+    );
+  }
+  if (dirExists) {
+    const checkInSwaraAudioFiles = fs.existsSync(
+      path.join(String(fullSwaraMacStoragePath), "AudioFiles")
+    );
+    const checkInSwaraDBFile = fs.existsSync(
+      path.join(String(fullSwaraMacStoragePath), "db")
+    );
+
+    const checkInSwaraImageFiles = fs.existsSync(
+      path.join(String(fullSwaraMacStoragePath), "ImageFiles")
+    );
+
+    if (checkInSwaraAudioFiles && checkInSwaraDBFile === true) {
+      console.log("Files already exist, Cheers!");
+      return;
+    } else if (!checkInSwaraAudioFiles) {
+      createDir(
+        path.join(fullSwaraMacStoragePath, "AudioFiles"),
+        "Made AudioFiles"
+      );
+    } else if (!checkInSwaraDBFile) {
+      createDir(path.join(fullSwaraMacStoragePath, "db"), "Made db");
+    } else if (!checkInSwaraImageFiles) {
+      createDir(
+        path.join(fullSwaraMacStoragePath, "ImageFiles"),
+        "Made ImageFiles"
+      );
+    }
+  }
 }

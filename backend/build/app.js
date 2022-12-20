@@ -8,7 +8,8 @@
   const path = require("path");
   const fs = require("fs");
   const os = require("node:os");
-  const { nanoid } = require("nanoid");
+
+  const port = 5000;
 
   const osType = os.type();
   let fullAudioStoragePath;
@@ -77,8 +78,6 @@
       cb(null, Date.now() + "-" + file.originalname);
     },
   });
-
-
 
   const upload = multer({
     storage: fileStorageEngine,
@@ -183,6 +182,10 @@
 
         audioStream.pipe(res);
       } catch (err) {
+        if (err.errno === -4058)
+          res
+            .status(404)
+            .json({ errno: err.errno, errMsg: "Song file not found" });
         console.log(err);
         return;
       }
@@ -201,8 +204,8 @@
 
     if (imagePath.length === 0)
       res.status(404).send("There is no image for this song.");
-    let fullpath = path.join(fullImageStoragePath, imagePath[0].image_path);
     try {
+      let fullpath = path.join(fullImageStoragePath, imagePath[0].image_path);
       const imageSize = fs.statSync(String(fullpath)).size;
       const CHUNK_SIZE = 10 ** 10;
       const start = 0;
@@ -233,6 +236,56 @@
     const hasImages = await model.checkImages(id);
 
     res.status(200).json({ count: hasImages });
+  });
+
+  // returns all images entries of a particular song
+  app.get("/api/images/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const images = await model.getImageData(id);
+      res.status(200).json({ code: 200, images: images });
+    } catch (err) {
+      res.status(400).json({ code: 404, msg: "Internal server error." });
+    }
+  });
+
+  // store images temporarily while editing
+  app.post(
+    "/api/temp/store",
+    upload.array("temp_imgs", 10),
+    async (req, res) => {
+      try {
+        await model.addTempFiles(req);
+        res.status(200).json({ code: 200, msg: "Saved temp files" });
+      } catch (err) {
+        res.status(400).json({ code: 404, msg: "Internal server error." });
+      }
+    }
+  );
+
+  // remove temp images
+  app.post("/api/temp/remove", async (req, res) => {
+    const { id, start } = req.body;
+
+    try {
+      if (String(start) !== "null") {
+        const paths = await model.getImageData(id);
+        for (let i = start; i < paths.length; ++i) {
+          fs.unlink(
+            path.join(fullImageStoragePath, paths[i].image_path),
+            (err) => {
+              if (err) console.log(err);
+            }
+          );
+        }
+        await model.clearTemps(id, start);
+      }
+      res.status(200).json({ code: 200, msg: "Temps are cleared." });
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ code: 404, msg: "Internal server error." });
+    }
   });
 
   //get by id
@@ -292,19 +345,25 @@
       const hasImages = await model.checkImages(id);
       let images;
       try {
-        model.del(req.params.id);
         try {
           fs.unlink(file, (err) => {
             if (err) console.log(err);
           });
+          images = await model.getImageData(id);
           if (hasImages > 0) {
-            images = await model.getImagePath(id);
             for (const image of images) {
-              fs.unlink(image.image_path, (err) => {
-                if (err) console.log(err);
-              });
+              fs.unlink(
+                path.join(fullImageStoragePath, image.image_path),
+                (err) => {
+                  if (err) console.log(err);
+                }
+              );
             }
+            fs.rmdir(path.join(fullImageStoragePath, id), (err) => {
+              if (err) console.log(err);
+            });
           }
+          model.del(req.params.id);
         } catch (err) {
           console.log(err);
         }
@@ -497,6 +556,8 @@
     }
   });
 
-  app.listen(5000);
+  app.listen(port, () => {
+    console.log("Listening on port:", port);
+  });
   module.exports = app;
 })();

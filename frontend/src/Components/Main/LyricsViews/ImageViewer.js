@@ -5,6 +5,7 @@ import { IoMdClose } from "react-icons/io";
 import "../../../Stylesheets/Imageviewer.css";
 import { AiOutlineZoomIn, AiOutlineZoomOut } from "react-icons/ai";
 import { MdRotateLeft, MdRotateRight } from "react-icons/md";
+import { IconButton } from "@mui/material";
 
 const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
   const [page, setPage] = useState(0);
@@ -12,11 +13,7 @@ const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
   const [showRight, setShowRight] = useState(true);
   const [maxW, setMaxW] = useState(50);
   const [rotate, setRotate] = useState(0);
-  const [isLargerH, setIsLargerH] = useState(false);
   const [isLarger, setIsLarger] = useState(false);
-  const [changingW, setChangingW] = useState(0);
-
-  // console.log(page)
 
   const URL = useUrl();
   const imgRef = useRef();
@@ -34,25 +31,11 @@ const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
     setMaxW(50);
   }, [page]);
 
-  // useEffect(() => {
-  //   if (imgRef?.current?.height >= wrapperRef?.current?.offsetHeight) {
-  //     setIsLarger(true);
-  //   } else setIsLarger(false);
-  // }, [imgRef?.current?.height]);
-
-  // useEffect(() => {
-  //   if (rotate === 90 || rotate === -90 || rotate === 270 || rotate === -270) {
-  //     if (imgRef?.current?.naturalWidth > imgRef?.current?.naturalHeight) {
-  //       if (imgRef?.current?.width >= wrapperRef?.current?.offsetHeight) {
-  //         setIsLargerH(true);
-  //       } else setIsLargerH(false);
-  //     }
-  //   } else {
-  //     if (imgRef?.current?.height >= wrapperRef?.current?.offsetHeight) {
-  //       setIsLarger(true);
-  //     } else setIsLarger(false);
-  //   }
-  // }, [maxW, rotate]);
+  useEffect(() => {
+    if (imgRef?.current?.height >= wrapperRef?.current?.offsetHeight) {
+      setIsLarger(true);
+    } else setIsLarger(false);
+  }, [imgRef?.current?.height]);
 
   const handleImageChange = (incDec) => {
     if (page < maxPages - 1) {
@@ -83,10 +66,9 @@ const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
   return (
     <>
       <div className="image-viewer-wrapper" ref={wrapperRef}>
-        <IoMdClose
-          className="fullscreen-lyrics-close-btn-icon close-btn-image"
-          onClick={handleClose}
-        />
+        <IconButton className="close-image-viewer" onClick={handleClose}>
+          <IoMdClose />
+        </IconButton>
         <div className="image-viewer">
           <button
             className="image-control-buttons pagination-btns"
@@ -97,7 +79,12 @@ const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
           >
             <FaArrowLeft />
           </button>
-          <div className="imageview-container">
+          <div
+            className="imageview-container"
+            style={{
+              alignItems: isLarger ? "" : "center",
+            }}
+          >
             <img
               ref={imgRef}
               src={`${URL}/api/imageStream/${songId}/${page}`}

@@ -61,11 +61,12 @@ const ImagePreview = ({ src, style, openImg, removeImg }) => {
       <div
         className="remove-btn-container"
         style={{
-          transform: wantsRemove ? "translateY(0)" : "translateY(-4em)",
+          transform: wantsRemove
+            ? "translateY(0)"
+            : "translateY(-4em) scale(0)",
           opacity: wantsRemove ? "1" : "0",
-          height: wantsRemove ? "" : 0,
           padding: wantsRemove ? "" : 0,
-          transition: "0.2s",
+          transition: "0.4s",
         }}
         ref={outsideRef}
       >

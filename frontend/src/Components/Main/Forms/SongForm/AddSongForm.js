@@ -33,6 +33,7 @@ import { nanoid } from "nanoid";
 import FormInputText from "../FormElements/FormInputText";
 import FormInputAutoComplete from "../FormElements/FormInputAutoComplete";
 import ImagePreview from "./ImagePreview";
+import ImageListItem from "./ImageListItem";
 
 const AddSongForm = () => {
   const {
@@ -91,6 +92,10 @@ const AddSongForm = () => {
   };
 
   const imageChangeHandle = async (e) => {
+    if (images.length === 10) {
+      handleError("Image upload limit reached(10)!");
+      return;
+    }
     let files = Object.values(e.target.files);
     let count = 0;
     files.forEach((file) => {
@@ -98,6 +103,11 @@ const AddSongForm = () => {
         handleError("Please upload an image file!");
       else count++;
     });
+
+    if (files.length > 10) {
+      handleError("Please upload only 10 images!");
+      return;
+    }
 
     const fileObjs = files.map((file, idx) => {
       return {
@@ -249,8 +259,6 @@ const AddSongForm = () => {
     });
   };
 
-  // console.log(images)
-
   const removeImg = (idx) => {
     setImages((prev) => {
       return prev.filter((image, _, arr) => {
@@ -262,6 +270,10 @@ const AddSongForm = () => {
   };
 
   const addImage = (e) => {
+    if (images.length === 10) {
+      handleError("Image upload limit(10) reached!");
+      return;
+    }
     let files = Object.values(e.target.files);
     let count = 0;
     files.forEach((file) => {
@@ -269,6 +281,11 @@ const AddSongForm = () => {
         handleError("Please upload an image file!");
       else count++;
     });
+
+    if (files.length + images.length > 10) {
+      handleError(`You can only upload ${10 - images.length} more images`);
+      return;
+    }
 
     const fileObjs = files.map((file, idx) => {
       return {
@@ -411,13 +428,10 @@ const AddSongForm = () => {
                         size="small"
                         required={true}
                       >
-                        {images.length > 0 ? (
-                          <TiTick className="tick smalltick" />
-                        ) : (
-                          <p style={{ margin: 0, padding: 0, fontWeight: 400 }}>
-                            Upload image
-                          </p>
-                        )}
+                        <p style={{ margin: 0, padding: 0, fontWeight: 400 }}>
+                          Upload image
+                        </p>
+
                         <input
                           type="file"
                           onChange={imageChangeHandle}
@@ -529,28 +543,13 @@ const AddSongForm = () => {
             <div className="uploaded-images">
               {imageTbs.map((image, idx) => {
                 return (
-                  <div className="image-wrapper" key={nanoid(10)}>
-                    {image}
-                    <p className="image-index">{idx + 1}</p>
-                    <div className="order-btns-wrapper">
-                      {idx !== 0 && (
-                        <button
-                          className="order-btns"
-                          onClick={() => handleOrderUp(images[idx].order)}
-                        >
-                          <BsFillArrowUpCircleFill />
-                        </button>
-                      )}
-                      {idx !== images.length - 1 && (
-                        <button
-                          className="order-btns"
-                          onClick={() => handleOrderDown(images[idx].order)}
-                        >
-                          <BsFillArrowDownCircleFill />
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                  <ImageListItem
+                    image={image}
+                    idx={idx}
+                    images={images}
+                    handleOrderDown={(num) => handleOrderDown(num)}
+                    handleOrderUp={(num) => handleOrderUp(num)}
+                  />
                 );
               })}
               <IconButton className="add-image" component="label">

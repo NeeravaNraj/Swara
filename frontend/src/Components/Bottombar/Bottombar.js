@@ -1,12 +1,11 @@
 import "../../Stylesheets/Bottombar.css";
 import AudioPlayer from "./AudioPlayer";
 
-function Bottombar() {
-
+function Bottombar({ handleError }) {
   return (
     <>
       <div className="bottombar">
-        <AudioPlayer />
+        <AudioPlayer handleError={(e) => handleError(e)} />
       </div>
     </>
   );

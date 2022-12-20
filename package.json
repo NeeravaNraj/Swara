@@ -1,6 +1,6 @@
 {
   "name": "swara",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Swara",
   "author": "Neerava <neerava.nraj@gmail.com>",
   "homepage": "./",
@@ -10,12 +10,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "electron:serve": "concurrently -k \"cd frontend && cross-env BROWSER=none npm start \" \"npm run electron:start\"",
-    "electron:build": "cd frontend && npm run build && cd .. && electron-builder -c.extraMetadata.main=main.js",
-    "build": "electron-builder -c.extraMetadata.main=main.js",
+    "electron:build": "cd frontend && yarn run build && cd .. && electron-builder -p -c.extraMetadata.main=main.js always",
+    "build": "electron-builder -c.extraMetadata.main=main.js -p always",
     "electron:start": "wait-on tcp:3000 && electron --trace-warnings .",
     "electron:build:linux": "cd frontend && npm run build && cd .. && electron-builder --linux"
   },
   "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "NeeravaNraj",
+        "repo": "Swara"
+      }
+    ],
     "extends": null,
     "appId": "Swara",
     "asar": false,
@@ -47,7 +54,6 @@
       "installerIcon": "",
       "uninstallerIcon": "",
       "uninstallDisplayName": "Swara",
-      "license": "license.txt",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     },
@@ -64,6 +70,8 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "electron-is-dev": "^2.0.0",
+    "electron-log": "^4.4.8",
+    "electron-updater": "^5.3.0",
     "express": "^4.18.1",
     "get-audio-duration": "^3.1.0",
     "hazardous": "^0.3.0",
@@ -73,7 +81,7 @@
     "wait-on": "^6.0.1"
   },
   "devDependencies": {
-    "electron-builder": "^23.3.3",
-    "electron": "^20.0.3"
+    "electron": "^20.0.3",
+    "electron-builder": "^23.3.3"
   }
 }

@@ -317,6 +317,7 @@
 
 .image-wrapper {
   position: relative;
+  height: 100%;
 }
 
 .uploaded-images {
@@ -430,18 +431,18 @@
 .add-image {
   background: none;
   border: none;
-  font-size: 2.2em;
+  font-size: 2.2em !important;
   padding: 0;
   margin: 0;
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: rgb(195, 195, 195);
+  color: rgb(195, 195, 195) !important;
   transition: 0.2s;
 }
 
 .add-image:hover {
-  color: rgb(216, 216, 216);
+  color: rgb(216, 216, 216) !important;
 }
 
 .add-image:active {

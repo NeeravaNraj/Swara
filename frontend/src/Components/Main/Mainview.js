@@ -26,7 +26,7 @@ import Lyrics from "./LyricsViews/Lyrics";
 import LyricsFullScreen from "./LyricsViews/LyricsFullScreen";
 import ImageViewer from "./LyricsViews/ImageViewer";
 
-function Mainview() {
+function Mainview({ handleError, error, checked }) {
   const { data, updateData, searchFocused } = useSongContext();
   const { showForm } = useFormShowContext();
   const { showPlaylistForm } = useShowPlaylistForm();
@@ -46,9 +46,7 @@ function Mainview() {
   const [showEditSong, setEditSong] = useState(false);
   const [editItems, setEditItems] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [checked, setChecked] = useState(false);
   const [details, setDetails] = useState({});
-  const [error, setError] = useState("");
   const [showLyrics, setShowLyrics] = useState(false);
   const [lyrics, setLyrics] = useState(null);
   const [showLyricsFullscreen, setShowLyricsFullscreen] = useState(false);
@@ -229,15 +227,6 @@ function Mainview() {
     setShowDetails(true);
   };
 
-  const handleError = (error) => {
-    setTimeout(() => setChecked(false), 1900);
-    setTimeout(() => setError(""), 2100);
-    if (!checked) {
-      setError(error);
-      setChecked(true);
-    }
-  };
-
   const handleLyrics = (lyrics) => {
     setLyrics(lyrics);
     setShowLyrics(true);
@@ -289,7 +278,7 @@ function Mainview() {
         ref={scrollRef}
         onKeyDown={(e) => handleSpace(e)}
       >
-        <div className="error-box-holder">
+        {/* <div className="error-box-holder">
           <Box className="error-container">
             <Slide direction="down" in={checked} container={scrollRef.current}>
               <Box
@@ -301,7 +290,7 @@ function Mainview() {
               </Box>
             </Slide>
           </Box>
-        </div>
+        </div> */}
 
         {showLyricsFullscreen && (
           <LyricsFullScreen
@@ -335,6 +324,7 @@ function Mainview() {
             open={showEditSong}
             close={(v) => setEditSong(v)}
             values={editItems}
+            handleError={(err) => handleError(err)}
           />
         )}
         {showDetails && (

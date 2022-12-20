@@ -339,6 +339,13 @@ const all = async (page) => {
   }
 };
 
+const updateImageEntries = async (songId, images) => {
+  // first delete the existing records for song
+  await db("image_table").where({ song_id: songId }).del();
+  for (const image of images)
+    insertImagePath(songId, image.image_path, image.order);
+};
+
 const preUpdateChecks = async (song_id, sentReq) => {
   const {
     song_name,
@@ -348,6 +355,7 @@ const preUpdateChecks = async (song_id, sentReq) => {
     composer_name,
     song_lyrics,
     lyricist_name,
+    image_path,
   } = sentReq;
 
   const compObj = createObject(composer_name, "composer");
@@ -369,6 +377,8 @@ const preUpdateChecks = async (song_id, sentReq) => {
     song_raga,
     song_type
   );
+
+  updateImageEntries(song_id, image_path);
 
   const proto = {
     song_name: song_name,
@@ -795,6 +805,70 @@ const checkImages = async (songid) => {
   return count;
 };
 
+const bubbleSort = (arr) => {
+  const sortedArr = arr;
+  for (let i = 0; i < sortedArr.length; ++i) {
+    for (let j = 0; j < sortedArr.length - i - 1; ++j) {
+      if (sortedArr[j].order > sortedArr[j + 1].order) {
+        let temp = sortedArr[j];
+        sortedArr[j] = sortedArr[j + 1];
+        sortedArr[j + 1] = temp;
+      }
+    }
+  }
+  return sortedArr;
+};
+
+const getImageData = async (songId) => {
+  const images = await db("image_table").select("*").where({ song_id: songId });
+  const sortedImgs = bubbleSort(images);
+  return sortedImgs;
+};
+
+const delParticularImage = async (songId, imgPath) => {
+  const orderNum = await db("image_table")
+    .select("order")
+    .where({ image_path: imgPath });
+  const images = await db("image_table").select("*").where({ song_id: songId });
+  let startDec = false;
+  if (orderNum !== images.length - 1) {
+    for (let image = 0; image < images.length; image++) {
+      if (startDec) {
+        await db("image_table")
+          .where({ image_path: images[image].image_path })
+          .update({
+            order: images[image].order + 1,
+          });
+        continue;
+      }
+      if (images[image].order === orderNum) startDec = true;
+    }
+  }
+
+  await db("image_table").where({ image_path: imgPath }).del();
+};
+
+const addTempFiles = async (sentReq) => {
+  const { id } = sentReq.body;
+  const count = await checkImages(id);
+
+  for (let i = 0; i < sentReq.files.length; i++) {
+    await insertImagePath(
+      id,
+      path.join(id, sentReq.files[i].filename),
+      count + i
+    );
+  }
+};
+
+const clearTemps = async (id, start) => {
+  const count = await checkImages(id);
+
+  for (let i = start; i < count; ++i) {
+    await db("image_table").where({ song_id: id, order: i }).del();
+  }
+};
+
 module.exports = {
   addSong,
   all,
@@ -818,4 +892,8 @@ module.exports = {
   deleteMasterContent,
   getImagePath,
   checkImages,
+  getImageData,
+  delParticularImage,
+  addTempFiles,
+  clearTemps,
 };

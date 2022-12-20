@@ -70,7 +70,7 @@
   transition: 0.2s;
   display: flex;
   position: relative;
-  z-index: 100;
+  z-index: 50;
 }
 
 .pagination-btns {
@@ -100,4 +100,13 @@
 
 .image-control-buttons:active {
   transform: scale(0.98);
+}
+
+.close-image-viewer {
+  color: white !important;
+  font-size: 2em !important;
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  margin: 1em 2em 0 0 !important;
 }

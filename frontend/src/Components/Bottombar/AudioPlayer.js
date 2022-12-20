@@ -21,7 +21,7 @@ import {
 } from "../../Hooks/SongProvider";
 import axios from "axios";
 
-function AudioPlayer() {
+function AudioPlayer({ handleError }) {
   const [isPlaying, setPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -35,7 +35,8 @@ function AudioPlayer() {
   const [playPrev, setPlayPrev] = useState(true);
   const [page, setPage] = useState(1);
   const [maxReached, setMaxReached] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [activateError, setActivateError] = useState(false);
 
   const audioPlayer = useRef(); //References our audio component
   const progressBar = useRef(); //References out progress bar
@@ -141,7 +142,7 @@ function AudioPlayer() {
   }, [searchFocused]);
 
   useEffect(() => {
-    if (!firstLoad)
+    if (firstLoad)
       if (typeof window !== undefined) {
         const prevId = localStorage.getItem("urlId");
         (async () => {
@@ -166,7 +167,7 @@ function AudioPlayer() {
         );
 
         changeVolSymbol(audioPlayer.current.volume);
-        setFirstLoad(true);
+        setFirstLoad(false);
       }
   }, []);
 
@@ -181,8 +182,14 @@ function AudioPlayer() {
   }, [progressBar?.current, audioPlayer?.current]);
 
   useEffect(() => {
+    audioPlayer.current.onerror = (err) => {
+      handleErr(err);
+    };
+  }, [firstLoad]);
+
+  useEffect(() => {
     if (urlId) {
-      if (data[0]) {
+      if (data.length > 0) {
         if (index === undefined) {
           getIndex();
         }
@@ -308,11 +315,6 @@ function AudioPlayer() {
         localStorage.setItem("urlId", "");
       }
     }
-    if (currIsPlaying === false && isPlaying === true) {
-      audioPlayer?.current?.pause();
-      cancelAnimationFrame(animationRef.current);
-      updateIsPlaying(true);
-    }
     if (songList && songList[index]) {
       setDuration(Math.floor(songList[index].song_duration));
     }
@@ -321,11 +323,13 @@ function AudioPlayer() {
   useEffect(() => {
     try {
       if (currIsPlaying) {
-        songList[index] &&
-          // setDuration(Math.floor(Math.floor(songList[index].song_duration)));
-        audioPlayer.current.play();
+        songList[index] && audioPlayer.current.play();
         animationRef.current = requestAnimationFrame(whilePlaying);
         setPlaying(true);
+      } else if (currIsPlaying === false && isPlaying === true) {
+        audioPlayer?.current?.pause();
+        cancelAnimationFrame(animationRef.current);
+        updateIsPlaying(true);
       } else {
         audioPlayer.current.pause();
         cancelAnimationFrame(animationRef.current);
@@ -378,7 +382,6 @@ function AudioPlayer() {
               )
               .then((resp) => {
                 if (resp.data.content.songs[0]) {
-                  // console.log(page, resp.data.content.songs);
                   if (
                     view.playlist_id === currentPlayingPlaylist &&
                     data.length !== numOfSongs
@@ -512,6 +515,12 @@ function AudioPlayer() {
     else return `${returnedMinute}:${returnedSeconds}`;
   };
 
+  const handleErr = (e) => {
+    let error = e.target.error;
+    if (!firstLoad)
+      if (error.code === 4) handleError(`Error: Could not load file!`);
+  };
+
   const handlePlay = () => {
     const prevVal = isPlaying;
     if (urlId === "") {
@@ -628,11 +637,12 @@ function AudioPlayer() {
       animationRef.current = requestAnimationFrame(whilePlaying);
     }
   };
+
   return (
     <>
       <audio
         ref={audioPlayer}
-        src={`${URL}/api/stream/${urlId}`}
+        src={urlId ? `${URL}/api/stream/${urlId}` : ""}
         type="audio/mp3"
         preload="metadata"
         onLoadedData={handleSongChange}

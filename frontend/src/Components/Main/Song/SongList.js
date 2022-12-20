@@ -20,6 +20,7 @@ import { NestedMenuItem } from "mui-nested-menu";
 import AreYouSure from "../../AreYouSure";
 import PlaylistItem from "./PlaylistItem";
 import FileDownloader from "./FileDownloader";
+import { IoMdImage } from "react-icons/io";
 
 function SongList(props) {
   const [isPlaying, setPlaying] = useState(false);
@@ -30,6 +31,7 @@ function SongList(props) {
   const [download, setDownload] = useState(false);
   const [url, setUrl] = useState(null);
   const [mouseOver, setMouseOver] = useState(false);
+  const [count, setCount] = useState(0);
   const open = Boolean(anchorElement);
 
   const currentSong = useCurrentSong();
@@ -62,6 +64,10 @@ function SongList(props) {
       }
     }
   }, [currIsPlaying]);
+
+  useEffect(() => {
+    hasImages();
+  }, []);
 
   const handleUpdate = async () => {
     updateSong(props.id);
@@ -177,23 +183,20 @@ function SongList(props) {
   const hasImages = async () => {
     const mp = await axios.get(`${URL}/api/imageCheck/${props.id}`);
     const count = mp.data.count;
-    if (count === 0) return false;
+    if (count === 0) setCount(0);
     if (count > 0) {
-      return {
-        count: count,
-      };
+      setCount(count);
     }
   };
 
   const handleLyricShow = async () => {
-    const has = await hasImages();
-    if (has) {
-      props.handleShowImages(props.id, has.count);
-    } else {
-      props.handleLyrics(props.lyrics);
-      setAnchorElement(null);
-      setContextMenu(null);
-    }
+    props.handleLyrics(props.lyrics);
+    setAnchorElement(null);
+    setContextMenu(null);
+  };
+
+  const handleShowImageShow = () => {
+    props.handleShowImages(props.id, count);
   };
 
   const handleStopDownload = () => {
@@ -274,6 +277,14 @@ function SongList(props) {
         </div>
 
         <div className="song-details">
+          {count !== 0 && (
+            <button
+              className="heart-btn lyrics-btn"
+              onClick={handleShowImageShow}
+            >
+              <IoMdImage className="heart" />
+            </button>
+          )}
           <button className="heart-btn lyrics-btn" onClick={handleLyricShow}>
             <TbMicrophone2 className="heart" />
           </button>
@@ -310,6 +321,11 @@ function SongList(props) {
                 >
                   <MenuItem onClick={handleDetails}>Details</MenuItem>
                   <MenuItem onClick={handleLyricShow}>Lyrics</MenuItem>
+                  {count !== 0 && (
+                    <MenuItem onClick={handleShowImageShow}>
+                      Image lyrics
+                    </MenuItem>
+                  )}
                   <MenuItem onClick={handleEdit}>Edit song</MenuItem>
                   <NestedMenuItem label="Add to playlist" parentMenuOpen={open}>
                     <div></div>

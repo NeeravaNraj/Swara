@@ -1,14 +1,19 @@
 const { app, BrowserWindow } = require("electron");
-
+const log = require("electron-log");
+const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const isDev = require("electron-is-dev");
 const { spawn } = require("child_process");
-
 require("@electron/remote/main").initialize();
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info("App starting...");
 
 let configurator = path.resolve(__dirname, "preStartConfigurator.js");
 
 const prep = spawn("node", [configurator]);
+
 
 prep.stdout.on("data", (data) => {
   let server = require(path.join(__dirname, "backend", "build", "app.js"));
@@ -57,7 +62,7 @@ const createWindow = () => {
       splash.close();
       mainWindow.center();
       mainWindow.show();
-    }, 2000);
+    }, 500);
   });
 };
 
