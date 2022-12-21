@@ -1,4 +1,4 @@
-*{
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -7,17 +7,19 @@
 
 body {
   background-color: rgb(55, 55, 55);
+  overflow: hidden;
 }
 
 .App {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 1em;
   align-items: center;
 }
 
 .swara-img {
-  height: 80vh;
+  height: 70vh;
 }
 
 .author-text {
@@ -25,17 +27,36 @@ body {
   bottom: 0;
   margin: auto;
   color: rgb(185, 185, 185);
-  margin-bottom: 3em;
+  margin-bottom: 5em;
 }
 
-.email{
+.email {
   position: absolute;
   bottom: 0;
   margin: auto;
   color: rgb(185, 185, 185);
-  margin-bottom: 1em;
+  margin-bottom: 3em;
 }
 
 .linear-progress {
   width: 50%;
+  margin-top: 1em;
+}
+
+.progress-data {
+  font-size: 1.2em;
+  color: white;
+  font-weight: 600;
+}
+
+.check {
+  font-size: 1.2em;
+  color: white;
+  font-weight: 600;
+}
+
+.failure {
+  font-size: 1.2em;
+  color: rgb(251, 102, 102);
+  font-weight: 600;
 }

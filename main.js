@@ -1,19 +1,24 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const log = require("electron-log");
 const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const isDev = require("electron-is-dev");
 const { spawn } = require("child_process");
-require("@electron/remote/main").initialize();
+const remote = require("@electron/remote/main");
+remote.initialize();
+const Events = require("./Events.js");
+const { env } = require("process");
 
 autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
+autoUpdater.logger.transports.file.level = "info";
 log.info("App starting...");
+
+let mainWindow;
+let splash;
 
 let configurator = path.resolve(__dirname, "preStartConfigurator.js");
 
 const prep = spawn("node", [configurator]);
-
 
 prep.stdout.on("data", (data) => {
   let server = require(path.join(__dirname, "backend", "build", "app.js"));
@@ -29,41 +34,43 @@ prep.on("exit", (code) => {
 });
 
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
-    width: 1600,
-    height: 900,
+  const { screen } = require("electron");
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+  mainWindow = new BrowserWindow({
+    width: width,
+    height: height,
     autoHideMenuBar: true,
     show: false,
-    webPreferences: {
-      nodeIntegration: true,
-      enableRemoteModule: true,
-    },
   });
 
-  const splash = new BrowserWindow({
-    width: 750,
-    height: 900,
+  splash = new BrowserWindow({
+    width: Math.round(width * 0.3),
+    height: Math.round(height * 0.7),
     transparent: true,
     frame: false,
     alwaysOnTop: true,
+    webPreferences: {
+      enableRemoteModule: true,
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
   });
 
-  splash.loadFile(path.join(__dirname, "splashscreen", "build", "index.html"));
+  remote.enable(splash.webContents);
+
   if (!isDev) {
+    splash.loadFile(
+      path.join(__dirname, "splashscreen", "build", "index.html")
+    );
+    autoUpdater.checkForUpdates();
     mainWindow.loadFile(
       path.join(__dirname, "frontend", "build", "index.html")
     );
   } else {
+    splash.loadURL("http://localhost:3456");
     mainWindow.loadURL("http://localhost:3000");
   }
-
-  mainWindow.once("ready-to-show", () => {
-    setTimeout(() => {
-      splash.close();
-      mainWindow.center();
-      mainWindow.show();
-    }, 500);
-  });
 };
 
 app.whenReady().then(() => {
@@ -78,4 +85,59 @@ app.on("window-all-closed", () => {
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
+
+// start
+ipcMain.on(Events.CHECK_FOR_UPDATE_PENDING, (event) => {
+  const { sender } = event;
+
+  // Automatically invoke success on development environment.
+  if (isDev) {
+    return sender.send(Events.CHECK_FOR_UPDATE_SUCCESS);
+  } else {
+    const result = autoUpdater.checkForUpdates();
+
+    result
+      .then((checkResult) => {
+        const { updateInfo } = checkResult;
+        return sender.send(Events.CHECK_FOR_UPDATE_SUCCESS, updateInfo);
+      })
+      .catch(() => {
+        return sender.send(Events.CHECK_FOR_UPDATE_FAILURE);
+      });
+  }
+});
+
+ipcMain.on(Events.DOWNLOAD_UPDATE_PENDING, (event) => {
+  const result = autoUpdater.downloadUpdate();
+  const { sender } = event;
+
+  result
+    .then(() => {
+      return sender.send(Events.DOWNLOAD_UPDATE_SUCCESS);
+    })
+    .catch(() => {
+      return sender.send(Events.DOWNLOAD_UPDATE_FAILURE);
+    });
+});
+
+ipcMain.on(Events.QUIT_AND_INSTALL_UPDATE, () => {
+  autoUpdater.quitAndInstall(
+    true, // isSilent
+    true // isForceRunAfter, restart app after update is installed
+  );
+});
+
+autoUpdater.on("download-progress", (progObj) => {
+  ipcMain.send("downloadProgress", progObj);
+});
+
+ipcMain.on("noUpdate", () => {
+  mainWindow.once("ready-to-show", () => {
+    setTimeout(() => {
+      splash.close();
+      mainWindow.center();
+      mainWindow.show();
+    }, 500);
+  });
 });
