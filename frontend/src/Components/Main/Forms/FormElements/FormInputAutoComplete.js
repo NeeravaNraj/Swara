@@ -7,6 +7,7 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { orange } from "@mui/material/colors";
+import { fontWeight } from "@mui/system";
 
 const theme = createTheme({
   palette: {
@@ -17,22 +18,28 @@ const theme = createTheme({
   },
 });
 
-function FormInputAutoComplete({ name, control, label, options, required, size }) {
+function FormInputAutoComplete({
+  name,
+  control,
+  label,
+  options,
+  required,
+  size,
+}) {
   return (
     <Controller
       name={name}
       control={control}
-      render={({ field: { ref, onChange, ...field } }) => {
+      render={({ field: { ref, onChange, value, ...field } }) => {
         return (
           <ThemeProvider theme={theme}>
             <Autocomplete
+              {...field}
               options={options}
               freeSolo={true}
               fullWidth
-              // autoSelect
-              onChange={(e, data) => onChange(data)}
+              onChange={(_, v) => onChange(v)}
               required={required}
-              getOptionLabel={(option) => option || ""}
               renderInput={(params) => {
                 return (
                   <TextField
@@ -40,6 +47,7 @@ function FormInputAutoComplete({ name, control, label, options, required, size }
                     {...field}
                     label={label}
                     inputRef={ref}
+                    onChange={(e) => onChange(e)}
                     required={required}
                     sx={{ mb: 2, width: "100%" }}
                     size={size}

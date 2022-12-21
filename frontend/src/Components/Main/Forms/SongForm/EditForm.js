@@ -32,7 +32,7 @@ const theme = createTheme({
   },
 });
 
-function EditForm({ open, close, values, handleError }) {
+function EditForm({ close, values, handleError }) {
   const [name, setName] = useState(values.song_name);
   const [raga, setRaga] = useState(values.raga);
   const [type, setType] = useState(values.song_type);
@@ -85,7 +85,7 @@ function EditForm({ open, close, values, handleError }) {
   }, [searchData]);
 
   const urlStreamHelper = (num) => {
-    return `${URL}/api/imageStream/${values.id}/${num}`;
+    return `${URL}/api/imageStream/${values.id}/${num}?ignore=${Date.now()}`;
   };
 
   const hasImgs = () => {

@@ -6,7 +6,7 @@ import {
   useSongContext,
   useViews,
   useNumberOfSongs,
-  useUrl
+  useUrl,
 } from "../../../../Hooks/SongProvider";
 
 function NoSongs({ page }) {
@@ -15,23 +15,17 @@ function NoSongs({ page }) {
   const { updateData } = useSongContext();
   const { currentView } = useViews();
   const { updateNumOfSongs } = useNumberOfSongs();
-  const URL = useUrl()
+  const URL = useUrl();
 
-  useEffect(() => {
-    if (tempSongs.length === 0) {
-      setTempSongsAxios();
-    }
-  }, [searchItem]);
-
-  const setTempSongsAxios = () => {
+  const setTempSongsAxios = (term) => {
     axios
-      .get(`${URL}/api/search?query=${searchItem}&page=${page}`)
+      .get(`${URL}/api/search?query=${term}&page=${page}`)
       .then((resp) => setTempSongs(resp.data.content.results));
   };
 
   const handleOnChange = (e) => {
     setSearchItem(e.target.value);
-    setTempSongsAxios();
+    setTempSongsAxios(e.target.value);
   };
 
   const handleAdd = (id) => {
@@ -49,7 +43,7 @@ function NoSongs({ page }) {
       }
     });
     setTempSongs(filteredTemp);
-    updateNumOfSongs(prev => prev + 1)
+    updateNumOfSongs((prev) => prev + 1);
   };
 
   return (

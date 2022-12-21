@@ -87,7 +87,7 @@ const ImageViewer = ({ songId, maxPages, handleClose, handleError }) => {
           >
             <img
               ref={imgRef}
-              src={`${URL}/api/imageStream/${songId}/${page}`}
+              src={`${URL}/api/imageStream/${songId}/${page}?ignore${Date.now()}`}
               type="image/jpg"
               preload="metadata"
               className="lyrics-image"
