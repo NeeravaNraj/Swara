@@ -343,7 +343,7 @@ const updateImageEntries = async (songId, images) => {
   // first delete the existing records for song
   await db("image_table").where({ song_id: songId }).del();
   for (const image of images)
-    insertImagePath(songId, image.image_path, image.order);
+    await insertImagePath(songId, image.image_path, image.order);
 };
 
 const preUpdateChecks = async (song_id, sentReq) => {
@@ -825,29 +825,6 @@ const getImageData = async (songId) => {
   return sortedImgs;
 };
 
-const delParticularImage = async (songId, imgPath) => {
-  const orderNum = await db("image_table")
-    .select("order")
-    .where({ image_path: imgPath });
-  const images = await db("image_table").select("*").where({ song_id: songId });
-  let startDec = false;
-  if (orderNum !== images.length - 1) {
-    for (let image = 0; image < images.length; image++) {
-      if (startDec) {
-        await db("image_table")
-          .where({ image_path: images[image].image_path })
-          .update({
-            order: images[image].order + 1,
-          });
-        continue;
-      }
-      if (images[image].order === orderNum) startDec = true;
-    }
-  }
-
-  await db("image_table").where({ image_path: imgPath }).del();
-};
-
 const addTempFiles = async (sentReq) => {
   const { id } = sentReq.body;
   const count = await checkImages(id);
@@ -893,7 +870,6 @@ module.exports = {
   getImagePath,
   checkImages,
   getImageData,
-  delParticularImage,
   addTempFiles,
   clearTemps,
 };

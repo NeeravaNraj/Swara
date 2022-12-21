@@ -201,7 +201,6 @@
     if (!imageNum) res.status(400).send("Require image number!");
 
     const imagePath = await model.getImagePath(id, imageNum);
-
     if (imagePath.length === 0)
       res.status(404).send("There is no image for this song.");
     try {
@@ -216,6 +215,11 @@
         "Accept-Ranges": "bytes",
         "Content-Length": contentLength,
         "Content-Type": "image/jpg",
+        "Pragma-directive": "no-cache",
+        "Cache-directive": "no-cache",
+        "Cache-control": "no-cache",
+        Pragma: "no-cache",
+        Expires: "0",
       };
 
       res.writeHead(206, header);
