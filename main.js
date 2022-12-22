@@ -10,6 +10,7 @@ const Events = require("./Events.js");
 const { env } = require("process");
 
 autoUpdater.logger = log;
+autoUpdater.autoDownload = false;
 autoUpdater.logger.transports.file.level = "info";
 log.info("App starting...");
 
@@ -38,8 +39,8 @@ const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
   mainWindow = new BrowserWindow({
-    width: width,
-    height: height,
+    width: 1600,
+    height: 900,
     autoHideMenuBar: true,
     show: false,
   });
@@ -63,7 +64,6 @@ const createWindow = () => {
     splash.loadFile(
       path.join(__dirname, "splashscreen", "build", "index.html")
     );
-    autoUpdater.checkForUpdates();
     mainWindow.loadFile(
       path.join(__dirname, "frontend", "build", "index.html")
     );
@@ -123,21 +123,19 @@ ipcMain.on(Events.DOWNLOAD_UPDATE_PENDING, (event) => {
 
 ipcMain.on(Events.QUIT_AND_INSTALL_UPDATE, () => {
   autoUpdater.quitAndInstall(
-    true, // isSilent
+    false, // isSilent
     true // isForceRunAfter, restart app after update is installed
   );
 });
 
 autoUpdater.on("download-progress", (progObj) => {
-  ipcMain.send("downloadProgress", progObj);
+  return splash.webContents.send("downloadProgress", progObj);
 });
 
 ipcMain.on("noUpdate", () => {
-  mainWindow.once("ready-to-show", () => {
-    setTimeout(() => {
-      splash.close();
-      mainWindow.center();
-      mainWindow.show();
-    }, 500);
-  });
+  setTimeout(() => {
+    splash.close();
+    mainWindow.center();
+    mainWindow.show();
+  }, 1000);
 });

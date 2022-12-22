@@ -127,6 +127,17 @@ function AudioPlayer({ handleError }) {
     });
   };
 
+  const getSearchIndex = () => {
+    data.map((song, idx) => {
+      if (index === undefined && String(song.song_id) === String(urlId)) {
+        updateIndex(idx, song);
+      } else {
+        setPlayNext(false);
+        setPlayPrev(false);
+      }
+    });
+  };
+
   useEffect(() => {
     const handleSpacebar = (e) => {
       if (!searchFocused && e.key === " ") {
@@ -232,6 +243,10 @@ function AudioPlayer({ handleError }) {
 
   useEffect(() => {
     if (view) {
+      if (currentView.view_name === "search") {
+        setSongList(data);
+        getSearchIndex();
+      }
       if (
         view.view_name === "playlist" &&
         view.playlist_id === currentPlayingPlaylist
@@ -374,7 +389,10 @@ function AudioPlayer({ handleError }) {
     if (songList) {
       if (index >= songList.length - 2) {
         if (!maxReached) {
-          if (view.view_name === "playlist") {
+          if (
+            view.view_name === "playlist" &&
+            currentView.view_name !== "search"
+          ) {
             setPage((prev) => prev + 1);
             axios
               .get(
@@ -441,6 +459,7 @@ function AudioPlayer({ handleError }) {
         }
       }
     } catch (err) {
+      console.log(err);
       return;
     }
   }, [isEnded]);
@@ -480,6 +499,7 @@ function AudioPlayer({ handleError }) {
         }
       }
     } catch (err) {
+      console.log(err);
       return;
     }
   }, [prevEnded]);

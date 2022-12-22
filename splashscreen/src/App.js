@@ -61,6 +61,7 @@ function App() {
       setDidCheckUpdateFail(true);
     });
     ipcRenderer.on("downloadProgress", (e, prog) => {
+      console.log(prog);
       setDownloadProgress(prog.percent);
       setDownloadSpeed(prog.bytesPerSecond);
       setDownloadedAmount(prog.transferred);
@@ -104,9 +105,10 @@ function App() {
         {isCheckingForUpdate && (
           <p className="check">Checking for updates...</p>
         )}
-        {isDownloading && (
+        {isDownloading && !isUpdateDownloaded && (
           <p className="progress-data">
-            Downloaded {downloadProgress}% - ({downloadedAmount} / {totalSize})
+            Downloaded {downloadProgress.toFixed(1)}% - ({downloadedAmount} /{" "}
+            {totalSize})
           </p>
         )}
         {didCheckUpdateFail && (
@@ -119,17 +121,21 @@ function App() {
           !updateFound &&
           !didCheckUpdateFail &&
           !didDownloadFail && <LinearProgress className="linear-progress" />}
-        {updateFound && (
-          <Button
-            variant="contained"
-            sx={{ color: "white" }}
-            onClick={handleDownload}
-          >
-            Download update
-          </Button>
-        )}
 
-        {isUpdateDownloaded && (
+        {updateFound &&
+          !isDownloading &&
+          !didDownloadFail &&
+          !didCheckUpdateFail && (
+            <Button
+              variant="contained"
+              sx={{ color: "white" }}
+              onClick={handleDownload}
+            >
+              Download update
+            </Button>
+          )}
+
+        {isUpdateDownloaded && !didDownloadFail && !didCheckUpdateFail && (
           <Button
             variant="contained"
             sx={{ color: "white" }}
@@ -139,7 +145,7 @@ function App() {
             Install update
           </Button>
         )}
-        {isDownloading && (
+        {isDownloading && !isUpdateDownloaded && (
           <LinearProgress
             className="linear-progress"
             variant="determinate"
@@ -147,8 +153,11 @@ function App() {
           />
         )}
       </ThemeProvider>
-      <p className="author-text">Made by Neerava and team.</p>
-      <p className="email">Email: neerava.nraj@gmail.com</p>
+      <div className="meta-div">
+        <p className="version">Swara verion {remote.app.getVersion()}</p>
+        <p className="author-text">Made by Neerava and team.</p>
+        <p className="email">Email: neerava.nraj@gmail.com</p>
+      </div>
     </div>
   );
 }

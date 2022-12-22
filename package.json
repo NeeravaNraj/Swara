@@ -1,6 +1,6 @@
 {
   "name": "swara",
-  "version": "1.2.1",
+  "version": "1.2.3",
   "description": "Swara",
   "author": "Neerava <neerava.nraj@gmail.com>",
   "homepage": "./",
@@ -9,13 +9,11 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "electron:serve": "concurrently -k \"cd frontend && cross-env BROWSER=none npm start \" \"npm run electron:start\"",
+    "electron:serve": "concurrently -k \"cd frontend && cross-env BROWSER=none yarn start \" \"cd splashscreen && cross-env BROWSER=none yarn start \" \"yarn run electron:start\"",
     "electron:build": "cd frontend && yarn run build && cd .. && electron-builder -p -c.extraMetadata.main=main.js always",
-
     "electron:splash": "concurrently -k \"cd splashscreen && cross-env BROWSER=none yarn start \" \"yarn run electron:startSplash\"",
-
     "build": "electron-builder -c.extraMetadata.main=main.js -p always",
-    "electron:start": "wait-on tcp:3000 && electron --trace-warnings .",
+    "electron:start": "wait-on tcp:3000 && wait-on tcp:3456 && electron --trace-warnings .",
     "electron:startSplash": "wait-on tcp:3456 && electron --trace-warnings .",
     "electron:build:linux": "cd frontend && npm run build && cd .. && electron-builder --linux"
   },
@@ -31,18 +29,17 @@
     "appId": "Swara",
     "asar": false,
     "files": [
-      "dist/**/*",
       "frontend/build/**/*",
       "backend/build/**/*",
       "node_modules/**/*",
       "splashscreen/build/**/*",
+      "splashscreen/package.json",
       "frontend/package.json",
       "backend/package.json",
       "main.js",
       "package.json",
       "preStartConfigurator.js",
-      "Swara-dark.png",
-      "Swara-light-png"
+      "Events.js"
     ],
     "directories": {
       "buildResources": "assets"
