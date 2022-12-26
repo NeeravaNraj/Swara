@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  /* height: 100%; */
 }
 
 .links-container {
@@ -62,9 +63,9 @@
 
 .playlist-scroll {
   overflow-x: hidden;
-  height: 42vh;
+  overflow-y: auto;
+  height: 35vh;
   width: 100%;
-  overflow-y: scroll;
 }
 
 .playlist-scroll::-webkit-scrollbar {
@@ -130,20 +131,24 @@
   font-size: 1.4em;
 }
 
-@media screen and (max-height: 900px) {
+@media screen and (max-height: 920px) {
   .playlist-scroll {
     overflow-x: hidden;
-    height: 30vh;
+    max-height: 25vh;
     width: 100%;
     overflow-y: scroll;
   }
 }
 
-@media screen and (max-height: 700px) {
+@media screen and (max-height: 800px) {
   .playlist-scroll {
     overflow-x: hidden;
-    height: 15vh;
+    max-height: 20vh;
     width: 100%;
     overflow-y: scroll;
+  }
+
+  .settings-container {
+    margin-bottom: 1em;
   }
 }

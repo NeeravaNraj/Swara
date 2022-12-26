@@ -35,7 +35,7 @@ import FormInputAutoComplete from "../FormElements/FormInputAutoComplete";
 import ImagePreview from "./ImagePreview";
 import ImageListItem from "./ImageListItem";
 
-const AddSongForm = () => {
+const AddSongForm = ({ showAp }) => {
   const {
     handleSubmit,
     control,
@@ -327,8 +327,15 @@ const AddSongForm = () => {
           }}
         />
       </Modal>
-      <div className="background" onClick={onClickHandleFormClose}></div>
-      <div className="form-container">
+      <div
+        className="background"
+        onClick={onClickHandleFormClose}
+        style={{ height: showAp ? "90vh" : "100vh" }}
+      ></div>
+      <div
+        className="form-container"
+        style={{ height: showAp ? "90vh" : "100vh" }}
+      >
         <div className="flex-reset">
           {isLoading ? (
             <div
@@ -390,10 +397,11 @@ const AddSongForm = () => {
                     control={control}
                     required={true}
                   />
+
                   <FormInputAutoComplete
-                    name="composer"
-                    label="Composer"
-                    options={composerSearchData}
+                    name="lyricist"
+                    label="Tala"
+                    options={lyricistSearchData}
                     control={control}
                     required={false}
                   />
@@ -401,12 +409,13 @@ const AddSongForm = () => {
 
                 <Stack direction={"row"} spacing={2}>
                   <FormInputAutoComplete
-                    name="lyricist"
-                    label="Lyricist"
-                    options={lyricistSearchData}
+                    name="composer"
+                    label="Composer"
+                    options={composerSearchData}
                     control={control}
                     required={false}
                   />
+
                   <FormInputAutoComplete
                     name="tuned_by"
                     label="Tuned by"

@@ -32,7 +32,7 @@ const theme = createTheme({
   },
 });
 
-function EditForm({ close, values, handleError }) {
+function EditForm({ close, values, handleError, showAp }) {
   const [name, setName] = useState(values.song_name);
   const [raga, setRaga] = useState(values.raga);
   const [type, setType] = useState(values.song_type);
@@ -312,8 +312,15 @@ function EditForm({ close, values, handleError }) {
           }}
         />
       </Modal>
-      <div className="background" onClick={() => handleClose("close")}></div>
-      <div className="form-container">
+      <div
+        className="background"
+        onClick={() => handleClose("close")}
+        style={{ height: showAp ? "90vh" : "100vh" }}
+      ></div>
+      <div
+        className="form-container"
+        style={{ height: showAp ? "90vh" : "100vh" }}
+      >
         <div className="flex-reset">
           {isUploaded ? (
             <div className="upload-success" onClick={() => close(false)}>
@@ -389,6 +396,31 @@ function EditForm({ close, values, handleError }) {
                       }}
                     />
                     <Autocomplete
+                      name="lyricist"
+                      options={lyricistSearchData}
+                      required={false}
+                      freeSolo={true}
+                      value={lyricist}
+                      onChange={(e, v) => setLyricist(v)}
+                      getOptionLabel={(option) => option || ""}
+                      fullWidth
+                      autoSelect
+                      renderInput={(params) => {
+                        return (
+                          <TextField
+                            {...params}
+                            label="Tala"
+                            sx={{ mb: 2 }}
+                            value={lyricist}
+                            onChange={(e) => setLyricist(e.target.value)}
+                          />
+                        );
+                      }}
+                    />
+                  </Stack>
+
+                  <Stack direction={"row"} spacing={2}>
+                    <Autocomplete
                       name="composer"
                       label="Composer"
                       options={composerSearchData}
@@ -407,31 +439,6 @@ function EditForm({ close, values, handleError }) {
                             sx={{ mb: 2 }}
                             value={composer}
                             onChange={(e) => setComposer(e.target.value)}
-                          />
-                        );
-                      }}
-                    />
-                  </Stack>
-
-                  <Stack direction={"row"} spacing={2}>
-                    <Autocomplete
-                      name="lyricist"
-                      options={lyricistSearchData}
-                      required={false}
-                      freeSolo={true}
-                      value={lyricist}
-                      onChange={(e, v) => setLyricist(v)}
-                      getOptionLabel={(option) => option || ""}
-                      fullWidth
-                      autoSelect
-                      renderInput={(params) => {
-                        return (
-                          <TextField
-                            {...params}
-                            label="Lyricist"
-                            sx={{ mb: 2 }}
-                            value={lyricist}
-                            onChange={(e) => setLyricist(e.target.value)}
                           />
                         );
                       }}

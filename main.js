@@ -43,6 +43,11 @@ const createWindow = () => {
     height: 900,
     autoHideMenuBar: true,
     show: false,
+    webPreferences: {
+      enableRemoteModule: true,
+      contextIsolation: false,
+      nodeIntegration: true,
+    },
   });
 
   splash = new BrowserWindow({
@@ -59,6 +64,7 @@ const createWindow = () => {
   });
 
   remote.enable(splash.webContents);
+  remote.enable(mainWindow.webContents);
 
   if (!isDev) {
     splash.loadFile(
@@ -137,5 +143,5 @@ ipcMain.on("noUpdate", () => {
     splash.close();
     mainWindow.center();
     mainWindow.show();
-  }, 1000);
+  }, 3000);
 });

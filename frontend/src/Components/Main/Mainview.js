@@ -26,7 +26,7 @@ import Lyrics from "./LyricsViews/Lyrics";
 import LyricsFullScreen from "./LyricsViews/LyricsFullScreen";
 import ImageViewer from "./LyricsViews/ImageViewer";
 
-function Mainview({ handleError, error, checked }) {
+function Mainview({ handleError, showAp }) {
   const { data, updateData, searchFocused } = useSongContext();
   const { showForm } = useFormShowContext();
   const { showPlaylistForm } = useShowPlaylistForm();
@@ -310,7 +310,7 @@ function Mainview({ handleError, error, checked }) {
 
         {showForm && (
           <div className="open-form absolute">
-            <AddSongForm className="absolute" />
+            <AddSongForm className="absolute" showAp={showAp} />
           </div>
         )}
 
@@ -325,6 +325,7 @@ function Mainview({ handleError, error, checked }) {
             close={(v) => setEditSong(v)}
             values={editItems}
             handleError={(err) => handleError(err)}
+            showAp={showAp}
           />
         )}
         {showDetails && (

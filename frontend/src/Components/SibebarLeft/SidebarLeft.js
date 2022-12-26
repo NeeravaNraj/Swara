@@ -4,7 +4,7 @@ import { AiOutlineHome } from "react-icons/ai";
 import { GoSearch } from "react-icons/go";
 import { BsPlusSquare } from "react-icons/bs";
 import { FaMusic } from "react-icons/fa";
-import { BiCog } from "react-icons/bi";
+import { BiCog, BiInfoCircle } from "react-icons/bi";
 import {
   useFormShowContext,
   useShowPlaylistForm,
@@ -15,14 +15,16 @@ import {
   useUrl,
   useIsPlayingContext,
 } from "../../Hooks/SongProvider";
+import { IoIosArrowDown } from "react-icons/io";
 import { Box, Slide } from "@mui/material";
 import { nanoid } from "nanoid";
 import Playlists from "./Playlists";
 import axios from "axios";
 import EditPlaylist from "./EditPlaylist";
 import SettingsWindow from "./SettingsComponents/SettingsWindow";
+import About from "./About/About";
 
-function SidbarLeft() {
+function SidbarLeft({ handleCollapse, showAp }) {
   const { setShow } = useFormShowContext();
   const { setShowPlaylist } = useShowPlaylistForm();
   const { allPlaylists, setAllPlaylists } = useAllPlaylists();
@@ -32,6 +34,7 @@ function SidbarLeft() {
   const URL = useUrl();
 
   const [showEditPlaylist, setShowEditPlaylist] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [editPlaylistId, setEditPlaylistId] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -125,6 +128,7 @@ function SidbarLeft() {
             error={error}
           />
         )}
+        <About open={showAbout} close={(v) => setShowAbout(v)} />
         <div className="sidebar-container">
           <div className="links-container">
             <button className="btn" onClick={() => handleSelectAll("home")}>
@@ -154,6 +158,20 @@ function SidbarLeft() {
           <button className="btn" onClick={handleShowSettings}>
             <BiCog className="icon cog" /> Settings
           </button>
+          <button className="btn" onClick={() => setShowAbout(true)}>
+            <BiInfoCircle className="icon cog" /> About
+          </button>
+          {!showAp && (
+            <button className="btn" onClick={handleCollapse}>
+              <IoIosArrowDown
+                className="icon cog"
+                style={{
+                  transform: "rotate(-180deg)",
+                }}
+              />
+              Show player
+            </button>
+          )}
         </div>
       </div>
     </>

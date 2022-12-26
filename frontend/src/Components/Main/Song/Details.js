@@ -21,7 +21,7 @@ function Details({ values, open, close }) {
         )}
         {lyricist !== "unknown" && (
           <>
-            <p className="descriptor">Lyricist</p>
+            <p className="descriptor">Tala</p>
             <h4 className="content complyrtun">{lyricist}</h4>
           </>
         )}

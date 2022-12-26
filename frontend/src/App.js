@@ -10,6 +10,7 @@ import { SongContextProvider } from "./Hooks/SongProvider";
 function App() {
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState("");
+  const [showAp, setShowAp] = useState(true);
 
   const divRef = useRef();
 
@@ -20,6 +21,10 @@ function App() {
       setError(error);
       setChecked(true);
     }
+  };
+
+  const handleCollapse = () => {
+    setShowAp((prev) => !prev);
   };
 
   return (
@@ -39,18 +44,30 @@ function App() {
             </Slide>
           </Box>
         </div>
-        <div className="grid-container">
+        <div
+          className="grid-container"
+          style={{
+            gridAutoRows: showAp ? "90vh" : "100vh",
+            transition: "0.4s ease",
+          }}
+        >
           <SongContextProvider>
-            <SidbarLeft className="sidebar-left" />
+            <SidbarLeft
+              className="sidebar-left"
+              handleCollapse={handleCollapse}
+              showAp={showAp}
+            />
             <Mainview
-              className="mainview"
               handleError={(e) => handleError(e)}
               error={error}
               checked={checked}
+              showAp={showAp}
             />
             <Bottombar
               className="bottom-bar"
               handleError={(e) => handleError(e)}
+              handleCollapse={handleCollapse}
+              showAp={showAp}
             />
           </SongContextProvider>
         </div>

@@ -15,12 +15,12 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1em;
   align-items: center;
+  gap: 0.5em;
 }
 
 .swara-img {
-  height: 70vh;
+  height: 69vh;
 }
 
 .author-text {
@@ -66,4 +66,20 @@ body {
   font-size: 1.2em;
   color: rgb(251, 102, 102);
   font-weight: 600;
+}
+
+@media screen and (max-height: 520px) {
+  .swara-img {
+    height: 63vh;
+  }
+}
+
+@media screen and (max-height: 480px) {
+  .author-text {
+    font-size: 0.8em;
+  }
+
+  .email {
+    font-size: 0.8em;
+  }
 }

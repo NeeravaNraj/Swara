@@ -42,5 +42,6 @@
 .descriptor {
   margin: 0;
   padding: 0;
-  color: gray;
+  color: rgb(157, 157, 157);
+  font-size: 1.1em;
 }

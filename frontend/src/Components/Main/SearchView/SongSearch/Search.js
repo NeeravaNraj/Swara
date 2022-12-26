@@ -18,7 +18,7 @@ const items = [
   { title: 'Search in "Song type"', colName: "song_type" },
   { title: 'Search in "Raga"', colName: "song_raga" },
   { title: 'Search in "Composer"', colName: "composer_name" },
-  { title: 'Search in "Lyricist"', colName: "lyricist_name" },
+  { title: 'Search in "Tala"', colName: "lyricist_name" },
   { title: 'Search in "Tuned by"', colName: "tuner_name" },
 ];
 

@@ -20,8 +20,9 @@ import {
   useNumberOfSongs,
 } from "../../Hooks/SongProvider";
 import axios from "axios";
+import { IoIosArrowDown } from "react-icons/io";
 
-function AudioPlayer({ handleError }) {
+function AudioPlayer({ handleError, handleCollapse, showAp }) {
   const [isPlaying, setPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -36,7 +37,6 @@ function AudioPlayer({ handleError }) {
   const [page, setPage] = useState(1);
   const [maxReached, setMaxReached] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const [activateError, setActivateError] = useState(false);
 
   const audioPlayer = useRef(); //References our audio component
   const progressBar = useRef(); //References out progress bar
@@ -668,14 +668,17 @@ function AudioPlayer({ handleError }) {
         onLoadedData={handleSongChange}
       ></audio>
       <div className="container">
+        <button className="collapse-btn" onClick={handleCollapse}>
+          <IoIosArrowDown />
+        </button>
         <div
           className="song-info"
           style={{ visibility: urlId === "" ? "hidden" : "visible" }}
         >
-          <div className="song-img">
+          <div className="song-img" style={{ display: showAp ? "" : "none" }}>
             <FaMusic className="music-icon" />
           </div>
-          <div className="song-meta">
+          <div className="song-meta" style={{ display: showAp ? "" : "none" }}>
             <h2 className="songname">
               {songname ? (
                 songname.name
