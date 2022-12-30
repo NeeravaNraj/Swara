@@ -522,9 +522,14 @@
 
     try {
       const data = await model.updateMasterContent(String(table), changes);
-      res.status(200).json({ message: "ok", content: data, type: table });
+      res.status(200).json({ status: "success", content: data, type: table });
     } catch (err) {
-      res.status(500).json({ message: `Internal server error: ${err}` });
+      if (err.errno === 19) {
+        res.status(200).json({
+          status: "error",
+          message: `This name already exists!`,
+        });
+      }
     }
   });
 
@@ -532,9 +537,12 @@
     const { id, type } = req.query;
     try {
       await model.deleteMasterContent(String(type), String(id));
-      res.status(200).json({ message: "ok" });
+      res.status(200).json({ status: "success" });
     } catch (err) {
-      res.status(500).json({ message: `Internal server error: ${err}` });
+      res.status(200).json({
+        status: "error",
+        message: `Cannot delete attribute which is in use!`,
+      });
     }
   });
 

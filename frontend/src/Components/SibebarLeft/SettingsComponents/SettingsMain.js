@@ -20,7 +20,6 @@ const theme = createTheme({
   },
 });
 
-
 function SettingsMain({ view, handleError }) {
   const [selectedValue, setSelectedValue] = useState("");
   const [inputValue, setInputValue] = useState(null);
@@ -58,7 +57,8 @@ function SettingsMain({ view, handleError }) {
   }, [options]);
 
   useEffect(() => {
-    if (inputValue !== Object.values(selectedValue).at(-1)) setDisableDelete(true);
+    if (inputValue !== Object.values(selectedValue).at(-1))
+      setDisableDelete(true);
     else setDisableDelete(false);
   }, [inputValue]);
 
@@ -88,6 +88,15 @@ function SettingsMain({ view, handleError }) {
 
   const handleEditOrDelete = (method) => {
     if (
+      inputValue === Object.values(selectedValue).at(-1) &&
+      method === "edit"
+    ) {
+      handleError("No changes made.");
+      return;
+    } else if (inputValue === "" && method === "edit") {
+      handleError("Please enter a valid name!");
+      return;
+    } else if (
       inputValue !== Object.values(selectedValue).at(-1) &&
       method === "edit"
     ) {
@@ -100,12 +109,6 @@ function SettingsMain({ view, handleError }) {
     ) {
       setAreYouSure({ method: method, name: inputValue });
       setShowAreYouSure(true);
-    }
-    if (
-      inputValue === Object.values(selectedValue).at(-1) &&
-      method === "edit"
-    ) {
-      handleError("No changes made.");
     }
   };
 
@@ -183,7 +186,7 @@ function SettingsMain({ view, handleError }) {
   const titler = () => {
     if (view.view_name === "type") setTitle("Song type");
     if (view.view_name === "composer") setTitle("Composers");
-    if (view.view_name === "lyricist") setTitle("Lyricist");
+    if (view.view_name === "lyricist") setTitle("Tala");
     if (view.view_name === "tuner") setTitle("Tuner");
     if (view.view_name === "raga") setTitle("Raga");
   };
@@ -196,7 +199,11 @@ function SettingsMain({ view, handleError }) {
         .delete(
           `${URL}/api/master/delete?id=${selectedId}&type=${view.view_name}`
         )
-        .then(() => {
+        .then((resp) => {
+          if (resp.data.status === "error") {
+            handleError(resp.data.message);
+            return;
+          }
           setOptions((prev) => {
             return prev.filter((option) => {
               if (Object.values(option)[0] !== selectedId) {
@@ -208,8 +215,8 @@ function SettingsMain({ view, handleError }) {
           setInputValue("");
           setSelectedId(null);
           optionGenerator();
-        })
-        .catch(handleError("Cannot delete attribute which is in use."));
+          handleError("Successfully deleted.");
+        });
     }
     if (method === "edit") {
       axios
@@ -219,11 +226,16 @@ function SettingsMain({ view, handleError }) {
           },
         })
         .then((resp) => {
+          if (resp.data.status === "error") {
+            handleError(resp.data.message);
+            return;
+          }
           updateOptions(resp.data.content[0], resp.data.type);
           setSelectedValue("");
           setInputValue("");
           setSelectedId(null);
           optionGenerator();
+          handleError("Successfully edited.");
         });
     }
   };

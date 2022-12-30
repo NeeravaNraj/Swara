@@ -1,6 +1,6 @@
 import { Modal } from "@mui/material";
 import React from "react";
-const remote = window.require("@electron/remote") || null;
+const remote = window.require ? window.require("@electron/remote") : null;
 
 const About = ({ open, close }) => {
   return (

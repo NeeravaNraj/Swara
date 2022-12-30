@@ -131,17 +131,34 @@ function SidbarLeft({ handleCollapse, showAp }) {
         <About open={showAbout} close={(v) => setShowAbout(v)} />
         <div className="sidebar-container">
           <div className="links-container">
-            <button className="btn" onClick={() => handleSelectAll("home")}>
+            <button
+              className={
+                currentView.view_name === "home" ? "btn sidebar-clicked" : "btn"
+              }
+              onClick={() => handleSelectAll("home")}
+            >
               <AiOutlineHome className="icon" /> Home
             </button>
-            <button className="btn" onClick={() => handleSelectAll("search")}>
+            <button
+              className={
+                currentView.view_name === "search"
+                  ? "btn sidebar-clicked"
+                  : "btn"
+              }
+              onClick={() => handleSelectAll("search")}
+            >
               <GoSearch className="icon" /> Search
             </button>
-            <button className="btn" onClick={() => handleSelectAll("songs")}>
+            <button
+              className={
+                currentView.playlist_id === 0 ? "btn sidebar-clicked" : "btn"
+              }
+              onClick={() => handleSelectAll("songs")}
+            >
               <FaMusic /> All Songs
             </button>
             <div className="add-items-container">
-              <button className="btn addbtn" onClick={handleFormOpen}>
+              <button className="addbtn" onClick={handleFormOpen}>
                 <BsPlusSquare className="icon addsong" /> Add Song
               </button>
               <button className="btn addbtn" onClick={handlePlaylistFormOpen}>

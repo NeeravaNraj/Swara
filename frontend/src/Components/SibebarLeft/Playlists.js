@@ -100,9 +100,10 @@ function Playlists(props) {
       >
         <button
           key={props.id}
-          className="btn"
+          className={
+            currentView.playlist_id === props.id ? "btn sidebar-clicked" : "btn"
+          }
           id="playlist-btn"
-          style={{ color: textColor }}
         >
           {props.name}
         </button>

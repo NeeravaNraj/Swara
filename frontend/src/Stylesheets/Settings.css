@@ -47,6 +47,12 @@
   border-radius: 10px;
 }
 
+.sidebar-option-clicked {
+  background-color: rgba(113, 112, 112, 0.5);
+  border-radius: 5px;
+  color: white;
+}
+
 .sidebar-option:hover {
   background-color: rgba(113, 112, 112, 0.5);
   border-radius: 5px;
@@ -75,19 +81,18 @@
   gap: 1em;
 }
 
-.error-container{
+.error-container {
   align-self: flex-start;
 }
 
-
 @media screen and (max-width: 750px) {
   .settings-window-container {
-  width: 500px;
-  height: 60vh;
-  display: grid;
-  grid-template-areas: "sideleft content";
-  grid-template-columns: 170px auto;
-  background-color: rgb(65, 65, 65);
-  border-radius: 10px;
-}
+    width: 500px;
+    height: 60vh;
+    display: grid;
+    grid-template-areas: "sideleft content";
+    grid-template-columns: 170px auto;
+    background-color: rgb(65, 65, 65);
+    border-radius: 10px;
+  }
 }

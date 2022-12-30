@@ -12,13 +12,14 @@
   align-items: flex-start;
   gap: 1em;
   padding: 2em 0em;
-  margin: 0em 2em;
+  margin: 0em 1em;
   /* padding-bottom: 2em; */
   border-bottom: 1px solid gray;
 }
 
 .btn {
   background: none;
+  padding: 0.3em 0.6em;
   border: none;
   font-size: 1.2em;
   color: rgb(193, 193, 193);
@@ -30,6 +31,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  width: 100%;
 }
 
 .icon {
@@ -37,19 +39,44 @@
 }
 
 .addbtn {
-  padding-top: 1em;
+  background: none;
+  padding: 0.3em 0.6em;
+  border: none;
+  font-size: 1.2em;
+  color: rgb(193, 193, 193);
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  transition: 0.5s;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
 }
 
 .addsong {
   margin-right: 0.2em;
 }
 
+.addbtn:hover {
+  color: white;
+  background-color: rgb(99, 99, 99);
+  border-radius: 5px;
+}
+
 .btn:hover {
   color: white;
+  background-color: rgb(99, 99, 99);
+  border-radius: 5px;
 }
 
 .add-items-container {
   padding-top: 1em;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
 }
 
 .playlist-container {
@@ -57,7 +84,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  margin: 0 0.5em 0 2em;
+  margin: 0 0.5em 0 1em;
   padding-top: 1em;
 }
 
@@ -124,11 +151,18 @@
   align-items: flex-start;
   gap: 1em;
   padding: 0em 0em 1.5em;
-  margin: 0em 2em;
+  margin: 0em 1em;
 }
 
 .cog {
   font-size: 1.4em;
+}
+
+.sidebar-clicked {
+  background-color: rgb(99, 99, 99);
+  border-radius: 5px;
+  width: 100%;
+  color: white;
 }
 
 @media screen and (max-height: 920px) {
